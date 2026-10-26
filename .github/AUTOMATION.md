@@ -2,7 +2,7 @@
 
 ## Cloud Mode
 
-`Tiny RPG Codex Runner` runs hourly on GitHub Actions or by manual dispatch. It selects the first unfinished existing `codex-task` issue in priority/key order, moves it to In Progress, asks Codex to implement that issue on a separate branch, runs the Jira queue self-test and Git path/whitespace checks, then opens a pull request. It comments on the Jira issue with the PR, changed files, static check results, and an explicit **Unity NOT VERIFIED** status. The issue stays In Progress and the PR stays open. An unfinished issue pauses later tasks. A failed run labels its issue `blocked` and records the run URL in Jira.
+`Tiny RPG Codex Runner` runs hourly on GitHub Actions or by manual dispatch. It selects the first unfinished existing `codex-task` issue in priority/key order, moves it to In Progress, asks Codex to implement that issue on a separate branch, runs the Jira queue self-test, protected path checks, and source file whitespace check, then opens a pull request. Unity generated `.prefab`, `.controller`, and `.meta` YAML is excluded from the whitespace check because Unity writes trailing spaces on empty scalar fields. It comments on the Jira issue with the PR, changed files, static check results, and an explicit **Unity NOT VERIFIED** status. The issue stays In Progress and the PR stays open. An unfinished issue pauses later tasks. A failed run labels its issue `blocked` and records the run URL in Jira.
 
 Required GitHub Actions repository secrets:
 
