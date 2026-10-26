@@ -31,16 +31,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         run: |
           if [[ -z "$OPENAI_API_KEY" || -z "$JIRA_EMAIL" || -z "$JIRA_API_TOKEN" ]]; then
             echo 'Missing OPENAI_API_KEY, JIRA_EMAIL, or JIRA_API_TOKEN secret'; exit 1
-          fi
-          if [[ -z "$UNITY_EMAIL" || -z "$UNITY_PASSWORD" || ( -z "$UNITY_LICENSE" && -z "$UNITY_SERIAL" ) ]]; then
-            echo 'Missing Unity license credentials (UNITY_EMAIL, UNITY_PASSWORD, and UNITY_LICENSE or UNITY_SERIAL)'; exit 1
           fi
       - name: Check Jira task logic
         run: python3 .github/scripts/jira_tasks.py selftest
@@ -82,44 +75,17 @@ jobs:
             echo 'Codex changed files outside Unity project directories'; exit 1
           fi
           git add -- Assets Packages ProjectSettings
-          git diff --cached --check -- '*.cs' '*.py' '*.json' '*.yml'
+          git diff --cached --check
           test -n "$(git diff --cached --name-only)"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m "${ISSUE_KEY}: Codex implementation"
           gh auth setup-git
           git push origin HEAD
-          pr_url=$(gh pr create --base main --head "$(git branch --show-current)" --title "${ISSUE_KEY}: Codex implementation" --body "Automated implementation for ${ISSUE_KEY}. Unity test results are attached to this run; visual rig and effect checks require Unity Editor review.")
+          pr_url=$(gh pr create --base main --head "$(git branch --show-current)" --title "${ISSUE_KEY}: Codex implementation" --body "Cloud Mode implementation for ${ISSUE_KEY}. Static checks ran in GitHub Actions. Unity import, compilation, prefab, animation, rig, scene, and Play Mode are NOT VERIFIED. Keep this PR open until Unity MCP Mode validation is recorded.")
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
-      - name: Unity compile and tests
+      - name: Report Cloud Mode result to Jira
         if: steps.publish.outputs.pr_url != ''
-        id: unity
-        uses: game-ci/unity-test-runner@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: 6000.3.12f1
-          testMode: All
-          coverageEnabled: false
-      - name: Save Unity test results
-        if: always() && steps.publish.outputs.pr_url != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: unity-test-results-${{ steps.task.outputs.issue }}
-          path: ${{ steps.unity.outputs.artifactsPath }}
-          if-no-files-found: warn
-      - name: Merge after Unity checks pass
-        if: steps.unity.outcome == 'success'
-        id: merge
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_URL: ${{ steps.publish.outputs.pr_url }}
-        run: gh pr merge "$PR_URL" --squash --delete-branch
-      - name: Report completion to Jira
-        if: steps.merge.outcome == 'success'
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
@@ -127,9 +93,9 @@ jobs:
           ISSUE_KEY: ${{ steps.task.outputs.issue }}
           PR_URL: ${{ steps.publish.outputs.pr_url }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: python3 .github/scripts/jira_tasks.py complete
+        run: python3 .github/scripts/jira_tasks.py cloud_report
       - name: Mark failed task as blocked in Jira
-        if: failure() && steps.task.outputs.issue != '' && steps.merge.outcome != 'success'
+        if: failure() && steps.task.outputs.issue != ''
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}

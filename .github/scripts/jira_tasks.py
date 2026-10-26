@@ -121,27 +121,30 @@ def prepare():
     print("Started", key)
 
 
-def report(completed):
+def report_cloud():
     key = os.environ["ISSUE_KEY"]
     pr = os.getenv("PR_URL") or "not created"
     run = os.getenv("RUN_URL") or "unavailable"
-    if completed:
-        files = subprocess.check_output(
-            ["gh", "pr", "diff", pr, "--name-only"], text=True
-        ).strip() or "none"
-        message = (
-            f"Codex implementation merged.\nPR: {pr}\nActions run: {run}\n"
-            f"Changed files:\n{files[:6000]}\n"
-            "Unity compile/Test Runner: passed (EditMode and PlayMode run). "
-            "Editor visual rig, sword alignment, and effects: NOT VERIFIED."
-        )
-        comment(key, message)
-        transition(key, "done")
-    else:
-        issue = jira("GET", f"/rest/api/3/issue/{key}?fields=labels")
-        labels = sorted(set(issue["fields"].get("labels", []) + ["blocked"]))
-        jira("PUT", f"/rest/api/3/issue/{key}", {"fields": {"labels": labels}})
-        comment(key, f"Automation blocked after a failed step.\nPR: {pr}\nActions run: {run}\nUnity visual validation: NOT VERIFIED. Check the run before retrying; dependent work is paused.")
+    files = subprocess.check_output(
+        ["gh", "pr", "diff", pr, "--name-only"], text=True
+    ).strip() or "none"
+    comment(key, (
+        f"Cloud Mode PR opened.\nPR: {pr}\nActions run: {run}\n"
+        f"Changed files:\n{files[:6000]}\n"
+        "Static checks: Jira queue self-test, protected path check, git diff --check passed. "
+        "Unity import, compilation, prefab, animation, rig, scene, and Play Mode: NOT VERIFIED. "
+        "Task remains In Progress; Unity MCP Mode review is required before merge."
+    ))
+
+
+def report_blocked():
+    key = os.environ["ISSUE_KEY"]
+    pr = os.getenv("PR_URL") or "not created"
+    run = os.getenv("RUN_URL") or "unavailable"
+    issue = jira("GET", f"/rest/api/3/issue/{key}?fields=labels")
+    labels = sorted(set(issue["fields"].get("labels", []) + ["blocked"]))
+    jira("PUT", f"/rest/api/3/issue/{key}", {"fields": {"labels": labels}})
+    comment(key, f"Automation blocked after a failed step.\nPR: {pr}\nActions run: {run}\nUnity validation: NOT VERIFIED. Check the run before retrying; dependent work is paused.")
 
 
 def selftest():
@@ -158,4 +161,4 @@ def selftest():
 
 
 if __name__ == "__main__":
-    {"prepare": prepare, "complete": lambda: report(True), "blocked": lambda: report(False), "selftest": selftest}[sys.argv[1]]()
+    {"prepare": prepare, "cloud_report": report_cloud, "blocked": report_blocked, "selftest": selftest}[sys.argv[1]]()
