@@ -131,7 +131,7 @@ def report_cloud():
     comment(key, (
         f"Cloud Mode PR opened.\nPR: {pr}\nActions run: {run}\n"
         f"Changed files:\n{files[:6000]}\n"
-        "Static checks: Jira queue self-test, protected path check, git diff --check passed. "
+        "Static checks: Jira queue self-test, protected path check, source file whitespace check passed. "
         "Unity import, compilation, prefab, animation, rig, scene, and Play Mode: NOT VERIFIED. "
         "Task remains In Progress; Unity MCP Mode review is required before merge."
     ))

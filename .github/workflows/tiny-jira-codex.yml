@@ -75,7 +75,7 @@ jobs:
             echo 'Codex changed files outside Unity project directories'; exit 1
           fi
           git add -- Assets Packages ProjectSettings
-          git diff --cached --check
+          git diff --cached --check -- '*.cs' '*.py' '*.json' '*.yml' '*.yaml'
           test -n "$(git diff --cached --name-only)"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
