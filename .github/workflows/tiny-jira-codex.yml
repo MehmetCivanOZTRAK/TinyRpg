@@ -1,10 +1,12 @@
 name: Tiny RPG Codex Runner
 on:
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       jira_issue:
         description: "Jira task key (e.g. TINY-7)"
-        required: true
+        required: false
         type: string
 permissions:
   contents: write
@@ -19,6 +21,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       ISSUE_KEY: ${{ inputs.jira_issue }}
+      JIRA_BASE_URL: https://mehmetciwan02-1793014553432.atlassian.net
       JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
       JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
     steps:
@@ -29,14 +32,31 @@ jobs:
         run: |
           python3 - <<'PY'
           import os,json,urllib.request,base64
-          key=os.environ['ISSUE_KEY']
-          if not (key.startswith('TINY-') and key[5:].isdigit()):
-              raise ValueError('Invalid Jira task key')
+          key=(os.getenv('ISSUE_KEY') or '').strip()
           if not os.environ['JIRA_EMAIL'] or not os.environ['JIRA_API_TOKEN']:
-              raise ValueError('Configure JIRA_EMAIL and JIRA_API_TOKEN as GitHub Actions secrets')
+              print('JIRA_EMAIL and JIRA_API_TOKEN must be configured as GitHub Secrets')
+              raise SystemExit(1)
           auth=base64.b64encode((os.environ['JIRA_EMAIL']+':'+os.environ['JIRA_API_TOKEN']).encode()).decode()
-          req=urllib.request.Request('https://mehmetciwan02-1793014553432.atlassian.net/rest/api/3/issue/'+key+'?fields=summary,description',headers={'Authorization':'Basic '+auth,'Accept':'application/json'})
-          with urllib.request.urlopen(req,timeout=30) as response: issue=json.load(response)
+          base=os.environ['JIRA_BASE_URL']
+          headers={'Authorization':'Basic '+auth,'Accept':'application/json'}
+          def fetch(path):
+              req=urllib.request.Request(base+path,headers=headers)
+              with urllib.request.urlopen(req,timeout=30) as response:return json.load(response)
+          if not key:
+              import urllib.parse
+              jql=urllib.parse.quote('project = TINY AND labels = codex-task ORDER BY created ASC')
+              records=fetch('/rest/api/3/search/jql?jql='+jql+'&maxResults=100&fields=summary,description,status')
+              issues=sorted(records.get('issues',[]),key=lambda x:int(x['key'].split('-')[1]))
+              issue=next((x for x in issues if x['fields']['status']['statusCategory']['key']!='done'),None)
+              if issue is None:
+                  print('No outstanding Jira task'); raise SystemExit(0)
+              if issue['fields']['status']['statusCategory']['key']!='new':
+                  print('First outstanding task is not ready:',issue['key']); raise SystemExit(0)
+              key=issue['key']
+          else:
+              if not (key.startswith('TINY-') and key[5:].isdigit()):raise ValueError('Invalid Jira task key')
+              issue=fetch('/rest/api/3/issue/'+key+'?fields=summary,description,status')
+          with open(os.environ['GITHUB_ENV'],'a') as env:env.write('ISSUE_KEY='+key+'\n')
           def text(x):
               if isinstance(x,str):return x
               if isinstance(x,list):return '\n'.join(map(text,x))
@@ -45,7 +65,19 @@ jobs:
           with open('/tmp/tiny-prompt.txt','w') as f:
               f.write('Complete only '+key+': '+issue['fields']['summary']+'\n'+text(issue['fields'].get('description'))[:12000])
           PY
+      - name: Skip if task already has an open pull request
+        id: dedupe
+        run: |
+          set -euo pipefail
+          open_pr=$(gh pr list --state open --search "$ISSUE_KEY in:title" --json number --jq 'length')
+          if [[ "$open_pr" != "0" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Task already has an open PR"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Prepare branch
+        if: steps.dedupe.outputs.skip == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -60,6 +92,7 @@ jobs:
           END
           cat /tmp/tiny-prompt.txt >> /tmp/guardrails.txt
       - name: Run Codex
+        if: steps.dedupe.outputs.skip == 'false'
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -67,6 +100,8 @@ jobs:
           prompt-file: /tmp/guardrails.txt
           output-file: /tmp/codex-report.txt
       - name: Open PR
+        if: steps.dedupe.outputs.skip == 'false'
+        id: publish
         run: |
           set -euo pipefail
           test -n "$(git status --porcelain)"
@@ -77,4 +112,23 @@ jobs:
           git diff --cached --check
           git commit -m "$ISSUE_KEY: Codex implementation"
           git push origin HEAD
-          gh pr create --base main --head "$(git branch --show-current)" --title "$ISSUE_KEY: Codex implementation" --body "Automated Codex implementation. Unity visual tests are not guaranteed."
+          pr_url=$(gh pr create --base main --head "$(git branch --show-current)" --title "$ISSUE_KEY: Codex implementation" --body "Automated Codex implementation. Unity visual tests are not guaranteed.")
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+      - name: Report result to Jira
+        if: always() && env.ISSUE_KEY != '' && steps.dedupe.outputs.skip == 'false'
+        env:
+          PR_URL: ${{ steps.publish.outputs.pr_url }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python3 - <<'PY'
+          import os,base64,json,urllib.request
+          email=os.getenv('JIRA_EMAIL'); token=os.getenv('JIRA_API_TOKEN')
+          if not email or not token: raise SystemExit(0)
+          key=os.getenv('ISSUE_KEY')
+          if not key: raise SystemExit(0)
+          auth=base64.b64encode((email+':'+token).encode()).decode()
+          text='Codex job: '+os.getenv('JOB_STATUS','unknown')+'.\nPR: '+(os.getenv('PR_URL') or 'not created')+'\nUnity Editor visual validation: NOT VERIFIED.'
+          body={'body':{'type':'doc','version':1,'content':[{'type':'paragraph','content':[{'type':'text','text':text}]}]}}
+          req=urllib.request.Request(os.environ['JIRA_BASE_URL']+'/rest/api/3/issue/'+key+'/comment',data=json.dumps(body).encode(),headers={'Authorization':'Basic '+auth,'Content-Type':'application/json','Accept':'application/json'},method='POST')
+          with urllib.request.urlopen(req,timeout=30) as r:print('Jira updated:',r.status)
+          PY
