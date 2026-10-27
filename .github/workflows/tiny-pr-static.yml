@@ -1,0 +1,52 @@
+name: Tiny RPG static validation
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate task selection logic
+        run: python3 .github/scripts/jira_tasks.py selftest
+      - name: Check diff formatting
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git diff --check "$BASE_SHA"...HEAD
+      - name: Check Unity asset metadata
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          changed = subprocess.check_output(
+              ["git", "diff", "--name-only", f"{os.environ['BASE_SHA']}...HEAD"],
+              text=True,
+          ).splitlines()
+          for name in changed:
+              path = Path(name)
+              if name.startswith("Assets/") and path.is_file() and path.suffix != ".meta":
+                  if not Path(name + ".meta").is_file():
+                      raise SystemExit(f"Missing Unity metadata: {name}.meta")
+
+          guids = {}
+          for path in Path("Assets").rglob("*.meta"):
+              match = re.search(r"(?m)^guid: ([0-9a-f]{32})$", path.read_text(errors="replace"))
+              if not match:
+                  raise SystemExit(f"Missing GUID: {path}")
+              guid = match.group(1)
+              if guid in guids:
+                  raise SystemExit(f"Duplicate GUID: {guids[guid]} and {path}")
+              guids[guid] = path
+          print(f"Checked {len(guids)} Unity metadata GUIDs")
+          PY
