@@ -19812,6 +19812,7 @@ GameObject:
   - component: {fileID: 7176134460279861767}
   - component: {fileID: 2004356233327124422}
   - component: {fileID: 4579314412761876558}
+  - component: {fileID: 5088550900502510056}
   m_Layer: 0
   m_Name: Warrior
   m_TagString: Untagged
@@ -19945,6 +19946,37 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &5088550900502510056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8135172672974403986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ff1122b9b053c743b4d7a51caac3cdc, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::WarriorAnimsFREE.WarriorCharacterAnimatorEvents
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  OnFootR:
+    m_PersistentCalls:
+      m_Calls: []
+  OnFootL:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLand:
+    m_PersistentCalls:
+      m_Calls: []
+  OnShoot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnWeaponSwitch:
+    m_PersistentCalls:
+      m_Calls: []
+  warriorController: {fileID: 0}
 --- !u!1 &8209815299712357172
 GameObject:
   m_ObjectHideFlags: 0

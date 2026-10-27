@@ -113,8 +113,47 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3721317665521863004, guid: 680deef96f8ffd74a822e02d99bf67c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2340547384382656099}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5930797124733245646, guid: 680deef96f8ffd74a822e02d99bf67c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 854288194577139942}
   m_SourcePrefab: {fileID: 100100000, guid: 680deef96f8ffd74a822e02d99bf67c9, type: 3}
+--- !u!1 &687431223000429775 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5930797124733245646, guid: 680deef96f8ffd74a822e02d99bf67c9, type: 3}
+  m_PrefabInstance: {fileID: 6612501970442906625}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &854288194577139942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687431223000429775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ff1122b9b053c743b4d7a51caac3cdc, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::WarriorAnimsFREE.WarriorCharacterAnimatorEvents
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  OnFootR:
+    m_PersistentCalls:
+      m_Calls: []
+  OnFootL:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLand:
+    m_PersistentCalls:
+      m_Calls: []
+  OnShoot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnWeaponSwitch:
+    m_PersistentCalls:
+      m_Calls: []
+  warriorController: {fileID: 0}
 --- !u!4 &7521175422860584285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3721317665521863004, guid: 680deef96f8ffd74a822e02d99bf67c9, type: 3}
