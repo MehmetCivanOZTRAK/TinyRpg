@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     private NavMeshAgent agent;
     private NavMeshPath agentpath;
     private Animator playerAnim;
+    private Health health;
     private bool isMove;
 
     public EnemyTarget CurrentEnemyTarget { get; private set; }
@@ -19,6 +20,9 @@ public class PlayerController : MonoBehaviour
         playerAnim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
         agentpath = new NavMeshPath();
+        health = GetComponent<Health>();
+        if (health != null)
+            health.Died += OnDeath;
         Rigidbody body = GetComponent<Rigidbody>();
         if (body != null)
             body.isKinematic = true;
@@ -43,26 +47,30 @@ public class PlayerController : MonoBehaviour
         EnemyTarget enemy = hit.collider.GetComponentInParent<EnemyTarget>();
         if (enemy != null)
         {
+            if (!enemy.IsAlive)
+                return;
+
             agent.ResetPath();
             isMove = false;
             playerAnim.SetBool("isRunning", false);
-            CurrentEnemyTarget = enemy;
-            TargetChanged?.Invoke(enemy);
+            SetTarget(enemy);
             return;
         }
 
-        if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Ground") ||
-            !agent.CalculatePath(hit.point, agentpath) ||
-            agentpath.status != NavMeshPathStatus.PathComplete)
+        if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Ground"))
             return;
 
-        if (!agent.SetPath(agentpath))
+        bool leaderAlive = health == null || health.IsAlive;
+        if (leaderAlive && (!agent.CalculatePath(hit.point, agentpath) ||
+            agentpath.status != NavMeshPathStatus.PathComplete || !agent.SetPath(agentpath)))
             return;
 
-        CurrentEnemyTarget = null;
-        TargetChanged?.Invoke(null);
-        isMove = true;
-        playerAnim.SetBool("isRunning", true);
+        SetTarget(null);
+        if (leaderAlive)
+        {
+            isMove = true;
+            playerAnim.SetBool("isRunning", true);
+        }
         arrowparticle.transform.position = hit.point;
         arrowparticle.Play();
 
@@ -81,6 +89,35 @@ public class PlayerController : MonoBehaviour
             member.MoveTo(hit.point - forward * row * 1.4f + right * side * 1.4f);
             index++;
         }
+    }
+
+    private void OnDeath(Health _)
+    {
+        if (agent.isOnNavMesh)
+            agent.ResetPath();
+        isMove = false;
+        playerAnim.SetBool("isRunning", false);
+    }
+
+    private void SetTarget(EnemyTarget target)
+    {
+        if (CurrentEnemyTarget != null)
+            CurrentEnemyTarget.GetComponent<Health>().Died -= OnTargetDied;
+        CurrentEnemyTarget = target;
+        if (target != null)
+            target.GetComponent<Health>().Died += OnTargetDied;
+        TargetChanged?.Invoke(target);
+    }
+
+    private void OnTargetDied(Health _)
+    {
+        SetTarget(null);
+    }
+
+    private void OnDestroy()
+    {
+        if (CurrentEnemyTarget != null)
+            CurrentEnemyTarget.GetComponent<Health>().Died -= OnTargetDied;
     }
 }
 
