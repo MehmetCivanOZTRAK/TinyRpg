@@ -1,7 +1,5 @@
 name: Tiny RPG Codex Runner
 on:
-  schedule:
-    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       jira_issue:
