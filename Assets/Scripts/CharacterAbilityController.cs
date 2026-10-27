@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Health))]
 public class CharacterAbilityController : MonoBehaviour
@@ -44,6 +47,135 @@ public class CharacterAbilityController : MonoBehaviour
         else
             nextETime = Time.time + ability.Cooldown;
         Used?.Invoke(slot, ability, target);
+        StartCoroutine(Cast(ability, target));
         return true;
+    }
+
+    private IEnumerator Cast(AbilityDefinition ability, EnemyTarget target)
+    {
+        Animator animator = GetComponent<Animator>();
+        if (animator != null && !string.IsNullOrEmpty(ability.AnimationTrigger))
+            animator.SetTrigger(ability.AnimationTrigger);
+        if (ability.CastTime > 0f)
+            yield return new WaitForSeconds(ability.CastTime);
+        if (!health.IsAlive || target == null || !target.IsAlive)
+            yield break;
+
+        Vector3 direction = target.transform.position - transform.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude > 0.01f)
+            transform.rotation = Quaternion.LookRotation(direction);
+
+        switch (ability.Effect)
+        {
+            case AbilityDefinition.EffectType.HeavySlash:
+                DamageArea(transform.position, ability.Radius, ability.Damage, true);
+                break;
+            case AbilityDefinition.EffectType.BattleCharge:
+                yield return Charge(target, ability);
+                break;
+            case AbilityDefinition.EffectType.PiercingArrow:
+                AbilityProjectile.Spawn(AttackOrigin("ArrowSpawnOrigin"), target, health, ability, 0f, true);
+                break;
+            case AbilityDefinition.EffectType.MultiShot:
+                for (int i = -1; i <= 1; i++)
+                    AbilityProjectile.Spawn(AttackOrigin("ArrowSpawnOrigin"), target, health, ability, i * 9f, false);
+                break;
+            case AbilityDefinition.EffectType.ArcaneBolt:
+                CombatProjectile.Spawn(AttackOrigin("StaffCastOrigin"), health, target, ability.Damage, true);
+                break;
+            case AbilityDefinition.EffectType.ArcaneExplosion:
+                DamageArea(target.transform.position, ability.Radius, ability.Damage, false);
+                ShowExplosion(target.transform.position, ability.Radius);
+                break;
+        }
+    }
+
+    private Vector3 AttackOrigin(string name)
+    {
+        foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            if (child.name == name)
+                return child.position;
+        return transform.position + Vector3.up;
+    }
+
+    private void DamageArea(Vector3 center, float radius, int damage, bool inFront)
+    {
+        foreach (EnemyTarget enemy in FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None))
+        {
+            if (!enemy.IsAlive)
+                continue;
+            Vector3 offset = enemy.transform.position - center;
+            offset.y = 0f;
+            if (offset.sqrMagnitude > radius * radius ||
+                (inFront && offset.sqrMagnitude > 0.01f &&
+                 Vector3.Dot(transform.forward, offset.normalized) < 0.4f))
+                continue;
+            CombatDamage.TryApply(health, enemy.GetComponent<Health>(), damage);
+        }
+    }
+
+    private IEnumerator Charge(EnemyTarget target, AbilityDefinition ability)
+    {
+        CharacterCombat combat = GetComponent<CharacterCombat>();
+        if (combat != null)
+            combat.SetTarget(null);
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        Vector3 start = transform.position;
+        Vector3 toward = target.transform.position - start;
+        toward.y = 0f;
+        Vector3 destination = start + toward.normalized * Mathf.Max(0f, toward.magnitude - 0.8f);
+        if (agent != null && agent.isOnNavMesh && agent.Raycast(destination, out NavMeshHit hit))
+            destination = hit.position;
+
+        HashSet<EnemyTarget> struck = new HashSet<EnemyTarget>();
+        DamageChargeSegment(start, start, ability.Damage, struck);
+        float speed = Mathf.Max(8f, ability.Range / 0.25f);
+        while (health.IsAlive && target != null && target.IsAlive &&
+               Vector3.Distance(transform.position, destination) > 0.05f)
+        {
+            Vector3 before = transform.position;
+            Vector3 after = Vector3.MoveTowards(before, destination, speed * Time.deltaTime);
+            if (agent != null && agent.isOnNavMesh)
+                agent.Move(after - before);
+            else
+                transform.position = after;
+            DamageChargeSegment(before, transform.position, ability.Damage, struck);
+            yield return null;
+        }
+        if (combat != null)
+            combat.SetTarget(target);
+    }
+
+    private void DamageChargeSegment(Vector3 start, Vector3 end, int damage, HashSet<EnemyTarget> struck)
+    {
+        Vector3 segment = end - start;
+        float lengthSquared = segment.sqrMagnitude;
+        foreach (EnemyTarget enemy in FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None))
+        {
+            if (!enemy.IsAlive || struck.Contains(enemy))
+                continue;
+            float t = lengthSquared > 0f ?
+                Mathf.Clamp01(Vector3.Dot(enemy.transform.position - start, segment) / lengthSquared) : 0f;
+            Vector3 nearest = start + segment * t;
+            if (Vector3.Distance(enemy.transform.position, nearest) > 1f)
+                continue;
+            struck.Add(enemy);
+            CombatDamage.TryApply(health, enemy.GetComponent<Health>(), damage);
+        }
+    }
+
+    private static void ShowExplosion(Vector3 center, float radius)
+    {
+        // shortcut: Primitive pulse gives temporary feedback; TINY-18 binds authored URP VFX.
+        GameObject pulse = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        pulse.name = "Arcane Explosion";
+        Destroy(pulse.GetComponent<Collider>());
+        pulse.transform.position = center + Vector3.up;
+        pulse.transform.localScale = Vector3.one * radius * 2f;
+        Material material = pulse.GetComponent<Renderer>().material;
+        material.color = new Color(0.5f, 0.3f, 1f);
+        Destroy(material, 0.2f);
+        Destroy(pulse, 0.2f);
     }
 }
