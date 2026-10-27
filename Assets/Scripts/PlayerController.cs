@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
         playerAnim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
         agentpath = new NavMeshPath();
+        Rigidbody body = GetComponent<Rigidbody>();
+        if (body != null)
+            body.isKinematic = true;
     }
 
     private void Update()
@@ -53,13 +56,31 @@ public class PlayerController : MonoBehaviour
             agentpath.status != NavMeshPathStatus.PathComplete)
             return;
 
+        if (!agent.SetPath(agentpath))
+            return;
+
         CurrentEnemyTarget = null;
         TargetChanged?.Invoke(null);
-        agent.SetPath(agentpath);
         isMove = true;
         playerAnim.SetBool("isRunning", true);
         arrowparticle.transform.position = hit.point;
         arrowparticle.Play();
+
+        Vector3 forward = hit.point - transform.position;
+        forward.y = 0;
+        forward = forward.sqrMagnitude > 0.01f ? forward.normalized : transform.forward;
+        Vector3 right = new Vector3(forward.z, 0, -forward.x);
+        int index = 0;
+        foreach (SquadMember member in FindObjectsByType<SquadMember>(FindObjectsSortMode.InstanceID))
+        {
+            if (!member.isActiveAndEnabled)
+                continue;
+
+            int row = index / 2 + 1;
+            float side = index % 2 == 0 ? -1f : 1f;
+            member.MoveTo(hit.point - forward * row * 1.4f + right * side * 1.4f);
+            index++;
+        }
     }
 }
 
