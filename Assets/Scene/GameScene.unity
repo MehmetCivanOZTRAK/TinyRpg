@@ -22253,6 +22253,7 @@ GameObject:
   - component: {fileID: 8971972167833028190}
   - component: {fileID: 8971972167833028191}
   - component: {fileID: 8971972167833028192}
+  - component: {fileID: 8971972167833028193}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -22402,6 +22403,8 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCombat
   characterClass: 0
+  castEffect: {fileID: 0}
+  hitEffect: {fileID: 3362559094653938668, guid: 6d9be190363175c47a89407642a9a0b9, type: 3}
 --- !u!114 &8971972167833028192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22416,6 +22419,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAbilityController
   qAbility: {fileID: 11400000, guid: 7db34ccbdb65e514eb5ef2611c877bea, type: 2}
   eAbility: {fileID: 11400000, guid: 26e50c18ceb720843b978a51c73c37bd, type: 2}
+--- !u!114 &8971972167833028193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8971972167833028184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d5e158f83286a9498dba506df527a00, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SquadHud
 --- !u!4 &8986428069347644506
 Transform:
   m_ObjectHideFlags: 0
