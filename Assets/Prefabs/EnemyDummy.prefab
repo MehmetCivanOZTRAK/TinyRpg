@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7676323327484413635}
   - component: {fileID: 6140373303702725122}
   - component: {fileID: 5122391472030434072}
+  - component: {fileID: 3162080303629671360}
+  - component: {fileID: 3948300760222050439}
   m_Layer: 0
   m_Name: EnemyDummy
   m_TagString: Untagged
@@ -128,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f0194ec16b33a409eecbf7c0336abc, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  maxHealth: 100
+  maxHealth: 45
 --- !u!114 &5122391472030434072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,3 +143,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12ee5788c667b114b918d2b24b8ca399, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTarget
+--- !u!195 &3162080303629671360
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526872680689874984}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.4
+  m_Speed: 2.8
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 540
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &3948300760222050439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526872680689874984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66fde85d79f3f5f4288d51b224b05c27, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  detectionRange: 7
+  attackRange: 1.6
+  damage: 5
+  attackInterval: 1.8
