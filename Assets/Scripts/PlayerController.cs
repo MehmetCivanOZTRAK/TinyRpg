@@ -31,6 +31,10 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         SetInput();
+        if (Input.GetKeyDown(KeyCode.Q))
+            DispatchAbility(CharacterAbilityController.Slot.Q);
+        if (Input.GetKeyDown(KeyCode.E))
+            DispatchAbility(CharacterAbilityController.Slot.E);
         if (isMove && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             isMove = false;
@@ -117,6 +121,12 @@ public class PlayerController : MonoBehaviour
     private void OnTargetDied(Health _)
     {
         SetTarget(null);
+    }
+
+    private void DispatchAbility(CharacterAbilityController.Slot slot)
+    {
+        foreach (CharacterAbilityController member in FindObjectsByType<CharacterAbilityController>(FindObjectsSortMode.None))
+            member.TryUse(slot, CurrentEnemyTarget);
     }
 
     private void OnDestroy()

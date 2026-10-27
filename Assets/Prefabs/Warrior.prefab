@@ -19815,6 +19815,7 @@ GameObject:
   - component: {fileID: 5088550900502510056}
   - component: {fileID: 4549902886797699785}
   - component: {fileID: 182300724018997547}
+  - component: {fileID: 8586245618274994202}
   m_Layer: 0
   m_Name: Warrior
   m_TagString: Untagged
@@ -20005,6 +20006,20 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCombat
   characterClass: 0
+--- !u!114 &8586245618274994202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8135172672974403986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8108683d0b917d14fa71ba90d214e64e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAbilityController
+  qAbility: {fileID: 11400000, guid: 7db34ccbdb65e514eb5ef2611c877bea, type: 2}
+  eAbility: {fileID: 11400000, guid: 26e50c18ceb720843b978a51c73c37bd, type: 2}
 --- !u!1 &8209815299712357172
 GameObject:
   m_ObjectHideFlags: 0
