@@ -19814,6 +19814,7 @@ GameObject:
   - component: {fileID: 4579314412761876558}
   - component: {fileID: 5088550900502510056}
   - component: {fileID: 4549902886797699785}
+  - component: {fileID: 182300724018997547}
   m_Layer: 0
   m_Name: Warrior
   m_TagString: Untagged
@@ -19857,7 +19858,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: 
+  m_WarningMessage:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -19872,7 +19873,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc52c341e0ca77d46a6b9518014dea34, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   arrowparticle: {fileID: 5036618456893006645}
 --- !u!54 &7176134460279861767
@@ -19991,6 +19992,19 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 100
+--- !u!114 &182300724018997547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8135172672974403986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48b5543cfb4e7e643ba0062f12b8107c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterCombat
+  characterClass: 0
 --- !u!1 &8209815299712357172
 GameObject:
   m_ObjectHideFlags: 0

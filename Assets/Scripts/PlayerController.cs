@@ -50,7 +50,8 @@ public class PlayerController : MonoBehaviour
             if (!enemy.IsAlive)
                 return;
 
-            agent.ResetPath();
+            if (agent.isOnNavMesh)
+                agent.ResetPath();
             isMove = false;
             playerAnim.SetBool("isRunning", false);
             SetTarget(enemy);
@@ -62,12 +63,14 @@ public class PlayerController : MonoBehaviour
 
         bool leaderAlive = health == null || health.IsAlive;
         if (leaderAlive && (!agent.CalculatePath(hit.point, agentpath) ||
-            agentpath.status != NavMeshPathStatus.PathComplete || !agent.SetPath(agentpath)))
+            agentpath.status != NavMeshPathStatus.PathComplete))
             return;
 
         SetTarget(null);
         if (leaderAlive)
         {
+            if (!agent.SetPath(agentpath))
+                return;
             isMove = true;
             playerAnim.SetBool("isRunning", true);
         }
@@ -106,6 +109,8 @@ public class PlayerController : MonoBehaviour
         CurrentEnemyTarget = target;
         if (target != null)
             target.GetComponent<Health>().Died += OnTargetDied;
+        foreach (CharacterCombat combat in FindObjectsByType<CharacterCombat>(FindObjectsSortMode.None))
+            combat.SetTarget(target);
         TargetChanged?.Invoke(target);
     }
 
