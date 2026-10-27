@@ -8,6 +8,8 @@ public class CharacterCombat : MonoBehaviour
     public enum Class { Warrior, Archer, Mage }
 
     [SerializeField] private Class characterClass;
+    [SerializeField] private GameObject castEffect;
+    [SerializeField] private GameObject hitEffect;
 
     private Health health;
     private NavMeshAgent agent;
@@ -21,6 +23,7 @@ public class CharacterCombat : MonoBehaviour
     private bool attacking;
 
     public EnemyTarget Target => target;
+    public Class CharacterClass => characterClass;
     private float Range => characterClass == Class.Warrior ? 2f : characterClass == Class.Archer ? 8f : 7f;
     private float Interval => characterClass == Class.Archer ? 0.8f : characterClass == Class.Warrior ? 1.1f : 1.3f;
     private int Damage => characterClass == Class.Warrior ? 20 : characterClass == Class.Archer ? 12 : 15;
@@ -109,11 +112,16 @@ public class CharacterCombat : MonoBehaviour
         if (aimedTarget == target && health.IsAlive && aimedTarget != null && aimedTarget.IsAlive &&
             Vector3.Distance(transform.position, aimedTarget.transform.position) <= Range + 0.25f)
         {
+            Vector3 origin = attackOrigin != null ? attackOrigin.position : transform.position + Vector3.up;
+            CombatVfx.Play(castEffect, origin, transform.rotation);
             if (characterClass == Class.Warrior)
-                CombatDamage.TryApply(health, aimedTarget.GetComponent<Health>(), Damage);
+            {
+                if (CombatDamage.TryApply(health, aimedTarget.GetComponent<Health>(), Damage))
+                    CombatVfx.Play(hitEffect, aimedTarget.transform.position + Vector3.up, Quaternion.identity);
+            }
             else
-                CombatProjectile.Spawn(attackOrigin != null ? attackOrigin.position : transform.position + Vector3.up,
-                    health, aimedTarget, Damage, characterClass == Class.Mage);
+                CombatProjectile.Spawn(origin, health, aimedTarget, Damage,
+                    characterClass == Class.Mage, hitEffect);
         }
         attacking = false;
     }

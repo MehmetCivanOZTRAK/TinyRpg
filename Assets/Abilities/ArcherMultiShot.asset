@@ -23,5 +23,6 @@ MonoBehaviour:
   targeting: 1
   effect: 3
   animationTrigger: Attack
-  visualEffect: {fileID: 0}
+  visualEffect: {fileID: 432350906011875738, guid: 6b9e9392ea32bab40baef03bfb83c757, type: 3}
+  impactEffect: {fileID: 3362559094653938668, guid: 6d9be190363175c47a89407642a9a0b9, type: 3}
   soundEffect: {fileID: 0}

@@ -7,9 +7,10 @@ public class CombatProjectile : MonoBehaviour
     private int damage;
     private float speed;
     private bool magic;
+    private GameObject hitEffect;
     private Material material;
 
-    public static void Spawn(Vector3 origin, Health attacker, EnemyTarget target, int damage, bool magic)
+    public static void Spawn(Vector3 origin, Health attacker, EnemyTarget target, int damage, bool magic, GameObject hitEffect = null)
     {
         // shortcut: Primitive projectiles allocate each shot; pool them when combat density grows.
         GameObject visual = GameObject.CreatePrimitive(magic ? PrimitiveType.Sphere : PrimitiveType.Cylinder);
@@ -23,6 +24,7 @@ public class CombatProjectile : MonoBehaviour
         projectile.damage = damage;
         projectile.speed = magic ? 11f : 18f;
         projectile.magic = magic;
+        projectile.hitEffect = hitEffect;
         projectile.material = visual.GetComponent<Renderer>().material;
         projectile.material.color = magic ? new Color(0.45f, 0.3f, 1f) : new Color(0.75f, 0.5f, 0.2f);
     }
@@ -40,7 +42,8 @@ public class CombatProjectile : MonoBehaviour
         Vector3 direction = destination - transform.position;
         if (direction.magnitude <= speed * Time.deltaTime + 0.1f)
         {
-            CombatDamage.TryApply(attacker, target.GetComponent<Health>(), damage);
+            if (CombatDamage.TryApply(attacker, target.GetComponent<Health>(), damage))
+                CombatVfx.Play(hitEffect, destination, Quaternion.identity);
             Destroy(gameObject);
             return;
         }

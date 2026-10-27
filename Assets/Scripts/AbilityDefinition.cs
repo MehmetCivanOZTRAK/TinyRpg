@@ -18,6 +18,7 @@ public class AbilityDefinition : ScriptableObject
     [SerializeField] private EffectType effect;
     [SerializeField] private string animationTrigger;
     [SerializeField] private GameObject visualEffect;
+    [SerializeField] private GameObject impactEffect;
     [SerializeField] private AudioClip soundEffect;
 
     public string Id => abilityId;
@@ -32,5 +33,6 @@ public class AbilityDefinition : ScriptableObject
     public EffectType Effect => effect;
     public string AnimationTrigger => animationTrigger;
     public GameObject VisualEffect => visualEffect;
+    public GameObject ImpactEffect => impactEffect;
     public AudioClip SoundEffect => soundEffect;
 }

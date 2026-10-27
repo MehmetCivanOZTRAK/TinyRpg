@@ -20006,6 +20006,8 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCombat
   characterClass: 0
+  castEffect: {fileID: 0}
+  hitEffect: {fileID: 3362559094653938668, guid: 6d9be190363175c47a89407642a9a0b9, type: 3}
 --- !u!114 &8586245618274994202
 MonoBehaviour:
   m_ObjectHideFlags: 0

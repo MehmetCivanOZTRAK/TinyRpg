@@ -10,6 +10,7 @@ public class AbilityProjectile : MonoBehaviour
     private int damage;
     private float remaining;
     private bool pierces;
+    private GameObject impactEffect;
 
     public static void Spawn(Vector3 origin, EnemyTarget target, Health attacker,
         AbilityDefinition ability, float spreadDegrees, bool pierces)
@@ -30,6 +31,7 @@ public class AbilityProjectile : MonoBehaviour
         projectile.damage = ability.Damage;
         projectile.remaining = ability.Range;
         projectile.pierces = pierces;
+        projectile.impactEffect = ability.ImpactEffect;
         projectile.material = arrow.GetComponent<Renderer>().material;
         projectile.material.color = new Color(0.85f, 0.55f, 0.2f);
     }
@@ -59,7 +61,8 @@ public class AbilityProjectile : MonoBehaviour
             if (offset.sqrMagnitude > 0.65f * 0.65f)
                 continue;
             struck.Add(enemy);
-            CombatDamage.TryApply(attacker, enemy.GetComponent<Health>(), damage);
+            if (CombatDamage.TryApply(attacker, enemy.GetComponent<Health>(), damage))
+                CombatVfx.Play(impactEffect, center, Quaternion.identity);
             if (!pierces)
             {
                 Destroy(gameObject);

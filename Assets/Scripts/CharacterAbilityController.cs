@@ -69,24 +69,29 @@ public class CharacterAbilityController : MonoBehaviour
         switch (ability.Effect)
         {
             case AbilityDefinition.EffectType.HeavySlash:
-                DamageArea(transform.position, ability.Radius, ability.Damage, true);
+                CombatVfx.Play(ability.VisualEffect, transform.position + transform.forward, transform.rotation);
+                DamageArea(transform.position, ability.Radius, ability.Damage, true, ability.ImpactEffect);
                 break;
             case AbilityDefinition.EffectType.BattleCharge:
+                CombatVfx.Play(ability.VisualEffect, transform.position, transform.rotation);
                 yield return Charge(target, ability);
                 break;
             case AbilityDefinition.EffectType.PiercingArrow:
+                CombatVfx.Play(ability.VisualEffect, AttackOrigin("ArrowSpawnOrigin"), transform.rotation);
                 AbilityProjectile.Spawn(AttackOrigin("ArrowSpawnOrigin"), target, health, ability, 0f, true);
                 break;
             case AbilityDefinition.EffectType.MultiShot:
+                CombatVfx.Play(ability.VisualEffect, AttackOrigin("ArrowSpawnOrigin"), transform.rotation);
                 for (int i = -1; i <= 1; i++)
                     AbilityProjectile.Spawn(AttackOrigin("ArrowSpawnOrigin"), target, health, ability, i * 9f, false);
                 break;
             case AbilityDefinition.EffectType.ArcaneBolt:
-                CombatProjectile.Spawn(AttackOrigin("StaffCastOrigin"), health, target, ability.Damage, true);
+                CombatVfx.Play(ability.VisualEffect, AttackOrigin("StaffCastOrigin"), transform.rotation);
+                CombatProjectile.Spawn(AttackOrigin("StaffCastOrigin"), health, target, ability.Damage, true, ability.ImpactEffect);
                 break;
             case AbilityDefinition.EffectType.ArcaneExplosion:
-                DamageArea(target.transform.position, ability.Radius, ability.Damage, false);
-                ShowExplosion(target.transform.position, ability.Radius);
+                CombatVfx.Play(ability.VisualEffect, target.transform.position, Quaternion.identity);
+                DamageArea(target.transform.position, ability.Radius, ability.Damage, false, ability.ImpactEffect);
                 break;
         }
     }
@@ -99,7 +104,7 @@ public class CharacterAbilityController : MonoBehaviour
         return transform.position + Vector3.up;
     }
 
-    private void DamageArea(Vector3 center, float radius, int damage, bool inFront)
+    private void DamageArea(Vector3 center, float radius, int damage, bool inFront, GameObject impactEffect)
     {
         foreach (EnemyTarget enemy in FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None))
         {
@@ -111,7 +116,8 @@ public class CharacterAbilityController : MonoBehaviour
                 (inFront && offset.sqrMagnitude > 0.01f &&
                  Vector3.Dot(transform.forward, offset.normalized) < 0.4f))
                 continue;
-            CombatDamage.TryApply(health, enemy.GetComponent<Health>(), damage);
+            if (CombatDamage.TryApply(health, enemy.GetComponent<Health>(), damage))
+                CombatVfx.Play(impactEffect, enemy.transform.position + Vector3.up, Quaternion.identity);
         }
     }
 
@@ -129,7 +135,7 @@ public class CharacterAbilityController : MonoBehaviour
             destination = hit.position;
 
         HashSet<EnemyTarget> struck = new HashSet<EnemyTarget>();
-        DamageChargeSegment(start, start, ability.Damage, struck);
+        DamageChargeSegment(start, start, ability.Damage, ability.ImpactEffect, struck);
         float speed = Mathf.Max(8f, ability.Range / 0.25f);
         while (health.IsAlive && target != null && target.IsAlive &&
                Vector3.Distance(transform.position, destination) > 0.05f)
@@ -140,14 +146,14 @@ public class CharacterAbilityController : MonoBehaviour
                 agent.Move(after - before);
             else
                 transform.position = after;
-            DamageChargeSegment(before, transform.position, ability.Damage, struck);
+            DamageChargeSegment(before, transform.position, ability.Damage, ability.ImpactEffect, struck);
             yield return null;
         }
         if (combat != null)
             combat.SetTarget(target);
     }
 
-    private void DamageChargeSegment(Vector3 start, Vector3 end, int damage, HashSet<EnemyTarget> struck)
+    private void DamageChargeSegment(Vector3 start, Vector3 end, int damage, GameObject impactEffect, HashSet<EnemyTarget> struck)
     {
         Vector3 segment = end - start;
         float lengthSquared = segment.sqrMagnitude;
@@ -161,21 +167,9 @@ public class CharacterAbilityController : MonoBehaviour
             if (Vector3.Distance(enemy.transform.position, nearest) > 1f)
                 continue;
             struck.Add(enemy);
-            CombatDamage.TryApply(health, enemy.GetComponent<Health>(), damage);
+            if (CombatDamage.TryApply(health, enemy.GetComponent<Health>(), damage))
+                CombatVfx.Play(impactEffect, enemy.transform.position + Vector3.up, Quaternion.identity);
         }
     }
 
-    private static void ShowExplosion(Vector3 center, float radius)
-    {
-        // shortcut: Primitive pulse gives temporary feedback; TINY-18 binds authored URP VFX.
-        GameObject pulse = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        pulse.name = "Arcane Explosion";
-        Destroy(pulse.GetComponent<Collider>());
-        pulse.transform.position = center + Vector3.up;
-        pulse.transform.localScale = Vector3.one * radius * 2f;
-        Material material = pulse.GetComponent<Renderer>().material;
-        material.color = new Color(0.5f, 0.3f, 1f);
-        Destroy(material, 0.2f);
-        Destroy(pulse, 0.2f);
-    }
 }

@@ -13,6 +13,7 @@ public class Health : MonoBehaviour, IDamageable
     [SerializeField, Min(1)] private int maxHealth = 100;
 
     public int CurrentHealth { get; private set; }
+    public int MaxHealth => Mathf.Max(1, maxHealth);
     public bool IsAlive => CurrentHealth > 0;
     public event Action<Health> Died;
 
