@@ -12,16 +12,21 @@
 
 `GameScene.unity` içindeki `Player` nesnesinde `PlayerController`, `NavMeshAgent` ve Animator var. `arrowparticle` alanı sahnedeki Particle System'e bağlı. `Main Camera` etiketi mevcut ve `CameraFollow.target` aynı `Player` kökünün Transform'una bağlı. `PlayerController` ve `CameraFollow` dosyaları bu görevde değiştirilmedi.
 
+## Giderilen regresyonlar
+
+- Warrior ve Archer `Run` klipleri `FootR`/`FootL` olaylarını çağırıyordu, fakat oyun prefablarında olay alıcısı yoktu. Projede zaten bulunan `WarriorCharacterAnimatorEvents` bileşeni iki prefaba ve sahnedeki `Player` nesnesine eklendi. Mage prefabında bu bileşen zaten vardı.
+- `GameScene` içindeki `Player`, Warrior prefabından bağımsız bir sahne kopyasıydı. Önceki prefab düzeltmesini miras almadığından materyali eksik sabit kılıcı gösteriyordu. Sahne kopyasında sağ el rigindeki kılıç açıldı, sabit kopya kaldırıldı ve `SwordHitOrigin` eklendi. Kamera hedefi, tıklama kontrolü, NavMeshAgent ve parçacık referansı korundu.
+
 ## Unity doğrulaması
 
 | Kontrol | Sonuç |
 | --- | --- |
-| Prefab/Animator/Avatar referansları | Bekliyor |
-| Idle ↔ Run, Attack/Release geçişleri | Bekliyor |
-| GameScene Play Mode tek karakter hareketi | Bekliyor |
-| Kamera takip davranışı | Bekliyor |
-| EditMode Test Runner | Bekliyor |
-| PlayMode Test Runner | Bekliyor |
-| Derleme ve konsol | Bekliyor |
+| Prefab/Animator/Avatar referansları | Unity 6000.3.12f1'de üç Avatar geçerli; üç controller ve parametreleri bağlı. |
+| Idle ↔ Run, Attack/Release geçişleri | Play Mode'da üç karakter Run ve Idle'a geçti; Warrior `Attack` → `Idle`, Archer/Mage `Attack` → `Release` → `Idle` görüldü. |
+| GameScene Play Mode tek karakter hareketi | Gerçek Game View zemin tıklamasıyla `Player` (0, 0, 0) konumundan (-2.62, 0, 1.37) konumuna hareket etti; `isRunning` tekrar false oldu. |
+| Kamera takip davranışı | `CameraFollow.target = Player`; hareket sonrasında kamera ile hedef konum arasındaki fark 0.000 m. |
+| EditMode Test Runner | 0 test keşfedildi; geçen test sayısı 0. |
+| PlayMode Test Runner | 0 test keşfedildi; geçen test sayısı 0. |
+| Derleme ve konsol | AssetDatabase yenileme ve script derlemesi tamamlandı; düzeltme sonrası 0 hata/uyarı. |
 
-Unity Editor çalışma ağacındaki önceki oturumun sahne yedeği için `Recovering Scene Backups` penceresinde duruyor. Yedek `Assets/_Recovery` içine korunup Editor açıldıktan sonra bu tablo gerçek sonuçlarla güncellenecek. Statik inceleme Play Mode doğrulaması sayılmaz.
+Coplay MCP'nin `Assets` yolu ayrı görev çalışma ağacını gösteriyordu. `GameScene` kaydedildi ve sonrasında kirli değildi. Recovery dosyaları ve yerel Coplay paketi görev dalına eklenmedi.
