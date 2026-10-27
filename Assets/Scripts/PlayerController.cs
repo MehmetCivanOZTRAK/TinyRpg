@@ -3,80 +3,63 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
-{   
-    
-    
-    [Header("Navmesh")]
+{
+    [SerializeField] private ParticleSystem arrowparticle;
+
     private NavMeshAgent agent;
     private NavMeshPath agentpath;
-    
-    [Header("Particle System")]
-    [SerializeField] ParticleSystem arrowparticle;
-    
-    private Vector3 targetposition;
-        private bool isMove = false;
-        private Ray ray;
-    [Header("Animation")] 
-   private Animator _playerAnim;
+    private Animator playerAnim;
+    private bool isMove;
+
+    public EnemyTarget CurrentEnemyTarget { get; private set; }
+    public event Action<EnemyTarget> TargetChanged;
 
     private void Awake()
     {
-        _playerAnim = GetComponent<Animator>();
+        playerAnim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-    }
-
-    private void Start()
-    {
         agentpath = new NavMeshPath();
     }
 
     private void Update()
     {
-        
-    SetInput();
-        if (isMove && !agent.pathPending && 
-            agent.remainingDistance <= agent.stoppingDistance)
+        SetInput();
+        if (isMove && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             isMove = false;
-            _playerAnim.SetBool("isRunning",isMove);
+            playerAnim.SetBool("isRunning", false);
         }
     }
 
     private void SetInput()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0) || Camera.main == null ||
+            !Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
+            return;
+
+        EnemyTarget enemy = hit.collider.GetComponentInParent<EnemyTarget>();
+        if (enemy != null)
         {
-            if (CanReachTarget())
-            {
-                agent.SetPath(agentpath);
-                isMove = true;
-                _playerAnim.SetBool("isRunning",isMove);
-            }
-        }
-    }
-    
-    private Vector3 GetMouseWorldPosition()
-    {
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray,out RaycastHit hit))
-        {
-            arrowparticle.transform.position = hit.point;
-            arrowparticle.Play();
-            return hit.point;
+            agent.ResetPath();
+            isMove = false;
+            playerAnim.SetBool("isRunning", false);
+            CurrentEnemyTarget = enemy;
+            TargetChanged?.Invoke(enemy);
+            return;
         }
 
-        return Vector3.zero;
-    }
+        if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Ground") ||
+            !agent.CalculatePath(hit.point, agentpath) ||
+            agentpath.status != NavMeshPathStatus.PathComplete)
+            return;
 
-    private bool CanReachTarget()
-    {
-        if (agent.CalculatePath(GetMouseWorldPosition(),agentpath) && 
-            agentpath.status == NavMeshPathStatus.PathComplete)
-        {
-            return true;
-        }
-
-        return false;
+        CurrentEnemyTarget = null;
+        TargetChanged?.Invoke(null);
+        agent.SetPath(agentpath);
+        isMove = true;
+        playerAnim.SetBool("isRunning", true);
+        arrowparticle.transform.position = hit.point;
+        arrowparticle.Play();
     }
 }
 
