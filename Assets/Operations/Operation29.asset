@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a0907b99e2a0044a290a64af1edd89, type: 3}
+  m_Name: Operation29
+  m_EditorClassIdentifier: Assembly-CSharp::OperationDefinition
+  missionId: operation-29
+  displayName: 29. Last Approach
+  prerequisiteMissionId: operation-28
+  mapScene: Map3Scene
+  finalOperation: 0
+  maxSquadSize: 3
+  availableCharacters: 000000000100000002000000
+  objective: 1
+  enemySpawns:
+  - position: {x: 3, y: 0, z: 0.0000010490733}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -2.5980773, y: 0, z: 1.499998}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 1.5000007, y: 0, z: -2.5980759}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -0.000002062372, y: 0, z: 3}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -1.4999971, y: 0, z: -2.598078}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 2.598074, y: 0, z: 1.5000039}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -3, y: 0, z: -0.00000021464784}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 2.5980768, y: 0, z: -1.4999987}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  - position: {x: -1.5000025, y: 0, z: 2.5980747}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  twoStarTimeSeconds: 400
+  threeStarMaxSquadDeaths: 0

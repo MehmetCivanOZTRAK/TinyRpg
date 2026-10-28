@@ -125,13 +125,16 @@ public class MissionManager : MonoBehaviour
         objectivePanel.SetActive(started);
         resultPanel.SetActive(started && State != Result.InProgress);
         OperationDefinition current = GetComponent<SquadPreparation>()?.Operation;
-        string objective = current != null && current.MissionObjective == OperationDefinition.Objective.ClearArea ?
+        string objective = current != null && current.MissionObjective == OperationDefinition.Objective.BossEncounter ?
+            "Defeat Shadow Warden: " :
+            current != null && current.MissionObjective == OperationDefinition.Objective.ClearArea ?
             "Clear marked area: " : "Eliminate enemies: ";
         objectiveText.text = (current != null ? current.DisplayName : "Operation 1") + "\n" +
             objective + (Total - Remaining) + "/" + Total;
         if (State != Result.InProgress)
         {
-            resultTitle.text = State == Result.Completed ? "Mission Completed" : "Mission Failed";
+            resultTitle.text = State != Result.Completed ? "Mission Failed" :
+                current != null && current.FinalOperation ? "Campaign Completed" : "Mission Completed";
             resultDetails.text = "Enemies eliminated: " + (Total - Remaining) + "/" + Total;
             resultStars.text = "Stars: " + StarsEarned + "   Best: " +
                 (current != null ? OperationProgress.BestStars(current.MissionId) : 0);
