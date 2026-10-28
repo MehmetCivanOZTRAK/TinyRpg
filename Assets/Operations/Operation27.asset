@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a0907b99e2a0044a290a64af1edd89, type: 3}
+  m_Name: Operation27
+  m_EditorClassIdentifier: Assembly-CSharp::OperationDefinition
+  missionId: operation-27
+  displayName: 27. Dominion Gate
+  prerequisiteMissionId: operation-26
+  mapScene: Map3Scene
+  finalOperation: 0
+  maxSquadSize: 3
+  availableCharacters: 000000000100000002000000
+  objective: 0
+  enemySpawns:
+  - position: {x: -3, y: 0, z: -0.00000007154928}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 2.5980768, y: 0, z: -1.4999988}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -1.5000024, y: 0, z: 2.598075}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 0.000003945871, y: 0, z: -3}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 1.5000004, y: 0, z: 2.5980759}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -2.5980759, y: 0, z: -1.5000007}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 3, y: 0, z: 0.0000020981465}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: -2.598078, y: 0, z: 1.499997}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  - position: {x: 1.500004, y: 0, z: -2.598074}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
+  twoStarTimeSeconds: 360
+  threeStarMaxSquadDeaths: 0

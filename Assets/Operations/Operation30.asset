@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a0907b99e2a0044a290a64af1edd89, type: 3}
+  m_Name: Operation30
+  m_EditorClassIdentifier: Assembly-CSharp::OperationDefinition
+  missionId: operation-30
+  displayName: 30. Shadow Warden
+  prerequisiteMissionId: operation-29
+  mapScene: Map3Scene
+  finalOperation: 1
+  maxSquadSize: 3
+  availableCharacters: 000000000100000002000000
+  objective: 2
+  enemySpawns:
+  - position: {x: -0.00000010732392, y: 0, z: 3}
+    inObjectiveArea: 1
+    prefabOverride: {fileID: 490501029242121500, guid: 6473ae9ae39b7a5439bef507640e35a7, type: 3}
+  - position: {x: -1.4999988, y: 0, z: -2.5980768}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  - position: {x: 2.598075, y: 0, z: 1.5000024}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  - position: {x: -3, y: 0, z: -0.0000039816455}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  - position: {x: 2.5980759, y: 0, z: -1.5000004}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  - position: {x: -1.5000007, y: 0, z: 2.5980759}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  - position: {x: 0.0000021339213, y: 0, z: -3}
+    inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
+  twoStarTimeSeconds: 420
+  threeStarMaxSquadDeaths: 0

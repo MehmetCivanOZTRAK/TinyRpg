@@ -24,6 +24,9 @@ public class SquadPreparation : MonoBehaviour
     [SerializeField] private Button switchMapButton;
     [SerializeField] private string otherMapScene;
     [SerializeField] private OperationDefinition switchMapUnlockOperation;
+    [SerializeField] private Button nextMapButton;
+    [SerializeField] private string nextMapScene;
+    [SerializeField] private OperationDefinition nextMapUnlockOperation;
 
     private bool archerSelected;
     private bool mageSelected;
@@ -62,7 +65,9 @@ public class SquadPreparation : MonoBehaviour
         mageButton.onClick.AddListener(() => TrySelect(CharacterCombat.Class.Mage));
         startButton.onClick.AddListener(() => StartOperation());
         backButton.onClick.AddListener(() => { choosingOperation = true; RefreshUI(); });
-        switchMapButton.onClick.AddListener(SwitchMap);
+        switchMapButton.onClick.AddListener(() => SwitchMap(switchMapButton, otherMapScene));
+        if (nextMapButton != null)
+            nextMapButton.onClick.AddListener(() => SwitchMap(nextMapButton, nextMapScene));
         RefreshUI();
     }
 
@@ -94,12 +99,12 @@ public class SquadPreparation : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    private void SwitchMap()
+    private void SwitchMap(Button button, string scene)
     {
-        if (switchMapButton.interactable && !string.IsNullOrEmpty(otherMapScene))
+        if (button.interactable && !string.IsNullOrEmpty(scene))
         {
             Time.timeScale = 1f;
-            SceneManager.LoadScene(otherMapScene);
+            SceneManager.LoadScene(scene);
         }
     }
 
@@ -161,7 +166,9 @@ public class SquadPreparation : MonoBehaviour
         List<EnemyTarget> required = new List<EnemyTarget>(requiredCount);
         for (int i = 0; i < positions.Length; i++)
         {
-            EnemyTarget enemy = Instantiate(enemyPrefab, positions[i], Quaternion.identity);
+            EnemyTarget prefab = operation.EnemySpawns[i].prefabOverride != null ?
+                operation.EnemySpawns[i].prefabOverride : enemyPrefab;
+            EnemyTarget enemy = Instantiate(prefab, positions[i], Quaternion.identity);
             bool objective = operation.MissionObjective == OperationDefinition.Objective.EliminateAll ||
                 operation.EnemySpawns[i].inObjectiveArea;
             if (objective)
@@ -199,6 +206,9 @@ public class SquadPreparation : MonoBehaviour
         {
             switchMapButton.interactable = switchMapUnlockOperation == null ||
                 OperationProgress.IsCompleted(switchMapUnlockOperation.MissionId);
+            if (nextMapButton != null)
+                nextMapButton.interactable = nextMapUnlockOperation == null ||
+                    OperationProgress.IsCompleted(nextMapUnlockOperation.MissionId);
             for (int i = 0; i < operations.Length && i < operationButtons.Length; i++)
             {
                 OperationDefinition candidate = operations[i];
