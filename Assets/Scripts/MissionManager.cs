@@ -8,6 +8,7 @@ public class MissionManager : MonoBehaviour
     private Health[] enemies;
     private Health[] squad;
     private GUIStyle label;
+    private bool started;
 
     public Result State { get; private set; }
     public int Total { get; private set; }
@@ -15,6 +16,15 @@ public class MissionManager : MonoBehaviour
 
     private void Start()
     {
+        if (GetComponent<SquadPreparation>() == null)
+            Begin();
+    }
+
+    public void Begin()
+    {
+        if (started)
+            return;
+        started = true;
         EnemyTarget[] targets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
         enemies = new Health[targets.Length];
         Total = Remaining = targets.Length;
@@ -73,6 +83,8 @@ public class MissionManager : MonoBehaviour
 
     private void OnGUI()
     {
+        if (!started)
+            return;
         Matrix4x4 previousMatrix = GUI.matrix;
         float scale = Mathf.Max(1f, Mathf.Min(Screen.width / 960f, Screen.height / 540f));
         GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * previousMatrix;
@@ -84,8 +96,8 @@ public class MissionManager : MonoBehaviour
             label.normal.textColor = Color.white;
         }
 
-        GUI.Box(new Rect(16, 96, 300, 68), GUIContent.none);
-        GUI.Label(new Rect(24, 101, 284, 58),
+        GUI.Box(new Rect(644, 16, 300, 68), GUIContent.none);
+        GUI.Label(new Rect(652, 21, 284, 58),
             "Operation 1\nEliminate enemies: " + (Total - Remaining) + "/" + Total, label);
         if (State != Result.InProgress)
         {
