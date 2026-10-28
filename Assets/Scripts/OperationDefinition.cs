@@ -1,18 +1,34 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Tiny RPG/Operation")]
 public class OperationDefinition : ScriptableObject
 {
+    public enum Objective { EliminateAll, ClearArea }
+
+    [Serializable]
+    public struct EnemySpawn
+    {
+        public Vector3 position;
+        public bool inObjectiveArea;
+    }
+
     [SerializeField] private string missionId = "operation-1";
     [SerializeField] private string displayName = "Operation 1";
+    [SerializeField] private string prerequisiteMissionId;
     [SerializeField, Min(1)] private int maxSquadSize = 1;
     [SerializeField] private CharacterCombat.Class[] availableCharacters = { CharacterCombat.Class.Warrior };
+    [SerializeField] private Objective objective;
+    [SerializeField] private EnemySpawn[] enemySpawns;
     [SerializeField, Min(1f)] private float twoStarTimeSeconds = 120f;
     [SerializeField, Min(0)] private int threeStarMaxSquadDeaths;
 
     public string MissionId => missionId;
     public string DisplayName => displayName;
+    public string PrerequisiteMissionId => prerequisiteMissionId;
     public int MaxSquadSize => Mathf.Max(1, maxSquadSize);
+    public Objective MissionObjective => objective;
+    public EnemySpawn[] EnemySpawns => enemySpawns;
     public float TwoStarTimeSeconds => Mathf.Max(1f, twoStarTimeSeconds);
     public int ThreeStarMaxSquadDeaths => Mathf.Max(0, threeStarMaxSquadDeaths);
 

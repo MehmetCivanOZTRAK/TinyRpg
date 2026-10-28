@@ -23,13 +23,14 @@ public class MissionManager : MonoBehaviour
             Begin();
     }
 
-    public void Begin()
+    public void Begin(EnemyTarget[] targets = null)
     {
         if (started)
             return;
         started = true;
         startTime = Time.time;
-        EnemyTarget[] targets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
+        if (targets == null)
+            targets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
         enemies = new Health[targets.Length];
         Total = Remaining = targets.Length;
         for (int i = 0; i < targets.Length; i++)
@@ -46,7 +47,6 @@ public class MissionManager : MonoBehaviour
             squad[i].Died += OnSquadDied;
         }
 
-        // shortcut: This first operation has scene-placed enemies; use spawn registration for dynamic missions.
         if (Total == 0 || squad.Length == 0)
             Finish(Result.Failed);
     }
@@ -91,6 +91,7 @@ public class MissionManager : MonoBehaviour
 
     public void Retry()
     {
+        GetComponent<SquadPreparation>()?.QueueRetry();
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
@@ -111,11 +112,15 @@ public class MissionManager : MonoBehaviour
         }
 
         GUI.Box(new Rect(644, 16, 300, 68), GUIContent.none);
+        OperationDefinition current = GetComponent<SquadPreparation>()?.Operation;
+        string objective = current != null && current.MissionObjective == OperationDefinition.Objective.ClearArea ?
+            "Clear marked area: " : "Eliminate enemies: ";
         GUI.Label(new Rect(652, 21, 284, 58),
-            "Operation 1\nEliminate enemies: " + (Total - Remaining) + "/" + Total, label);
+            (current != null ? current.DisplayName : "Operation 1") + "\n" +
+            objective + (Total - Remaining) + "/" + Total, label);
         if (State != Result.InProgress)
         {
-            GUI.Box(new Rect(300, 155, 360, 250), GUIContent.none);
+            GUI.Box(new Rect(300, 155, 360, 280), GUIContent.none);
             GUI.Label(new Rect(320, 175, 320, 45),
                 State == Result.Completed ? "Mission Completed" : "Mission Failed", label);
             GUI.Label(new Rect(320, 230, 320, 35),
@@ -126,6 +131,8 @@ public class MissionManager : MonoBehaviour
                 (operation != null ? OperationProgress.BestStars(operation.MissionId) : 0), label);
             if (GUI.Button(new Rect(385, 330, 190, 42), "Retry"))
                 Retry();
+            if (GUI.Button(new Rect(385, 378, 190, 42), "Map"))
+                GetComponent<SquadPreparation>()?.ReturnToMap();
         }
         GUI.matrix = previousMatrix;
     }

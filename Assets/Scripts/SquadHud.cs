@@ -6,6 +6,10 @@ public class SquadHud : MonoBehaviour
 
     private void OnGUI()
     {
+        SquadPreparation preparation = FindFirstObjectByType<SquadPreparation>();
+        if (preparation != null && !preparation.Started)
+            return;
+
         Matrix4x4 previousMatrix = GUI.matrix;
         float scale = Mathf.Max(1f, Mathf.Min(Screen.width / 960f, Screen.height / 540f));
         GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * previousMatrix;
