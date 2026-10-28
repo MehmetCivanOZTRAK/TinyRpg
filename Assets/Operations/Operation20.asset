@@ -16,29 +16,41 @@ MonoBehaviour:
   displayName: 20. Cursed Heart
   prerequisiteMissionId: operation-19
   mapScene: Map2Scene
+  missionScene: Operation20
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 0
   enemySpawns:
   - position: {x: -3.15, y: 0, z: -0.00000007512675}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 2.7279809, y: 0, z: -1.5749989}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -1.5750024, y: 0, z: 2.7279787}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 0.0000041431645, y: 0, z: -3.15}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5750004, y: 0, z: 2.72798}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279797, y: 0, z: -1.5750008}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 3.15, y: 0, z: 0.000002203054}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.727982, y: 0, z: 1.574997}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5750043, y: 0, z: -2.7279775}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -0.000006271092, y: 0, z: 3.15}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 315
   threeStarMaxSquadDeaths: 0

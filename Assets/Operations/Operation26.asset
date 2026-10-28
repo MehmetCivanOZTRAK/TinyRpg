@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 26. Broken Obelisk
   prerequisiteMissionId: operation-25
   mapScene: Map3Scene
+  missionScene: Operation26
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

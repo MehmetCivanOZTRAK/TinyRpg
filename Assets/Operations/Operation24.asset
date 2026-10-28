@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 24. Ash Fields
   prerequisiteMissionId: operation-23
   mapScene: Map3Scene
+  missionScene: Operation24
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

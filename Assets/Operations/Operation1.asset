@@ -15,13 +15,18 @@ MonoBehaviour:
   missionId: operation-1
   displayName: 1. Outskirts
   prerequisiteMissionId:
+  mapScene:
+  missionScene: Operation01
+  finalOperation: 0
   maxSquadSize: 1
   availableCharacters: 00000000
   objective: 0
   enemySpawns:
   - position: {x: -3, y: 0, z: 3}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 3, y: 0, z: -3}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 120
   threeStarMaxSquadDeaths: 0

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -27,10 +28,12 @@ public class SquadPreparation : MonoBehaviour
     [SerializeField] private Button nextMapButton;
     [SerializeField] private string nextMapScene;
     [SerializeField] private OperationDefinition nextMapUnlockOperation;
+    [SerializeField] private GameObject mapPreview;
 
     private bool archerSelected;
     private bool mageSelected;
     private bool started;
+    private bool loading;
     private bool choosingOperation = true;
     private static string pendingMissionId;
     private PlayerController player;
@@ -136,8 +139,8 @@ public class SquadPreparation : MonoBehaviour
 
     public bool StartOperation()
     {
-        if (started || choosingOperation || operation == null || player == null || mission == null || enemyPrefab == null ||
-            operation.EnemySpawns == null || operation.EnemySpawns.Length == 0 ||
+        if (started || loading || choosingOperation || operation == null || player == null || mission == null || enemyPrefab == null ||
+            string.IsNullOrEmpty(operation.MissionScene) || !Application.CanStreamedLevelBeLoaded(operation.MissionScene) ||
             !string.IsNullOrEmpty(operation.MapScene) && operation.MapScene != SceneManager.GetActiveScene().name ||
             !operation.Allows(CharacterCombat.Class.Warrior) ||
             SelectedCount > operation.MaxSquadSize ||
@@ -145,19 +148,63 @@ public class SquadPreparation : MonoBehaviour
             mageSelected && (magePrefab == null || !IsUnlocked(CharacterCombat.Class.Mage)))
             return false;
 
-        Vector3[] positions = new Vector3[operation.EnemySpawns.Length];
+        loading = true;
+        startButton.interactable = false;
+        StartCoroutine(LoadOperation());
+        return true;
+    }
+
+    private IEnumerator LoadOperation()
+    {
+        AsyncOperation load = SceneManager.LoadSceneAsync(operation.MissionScene, LoadSceneMode.Additive);
+        if (load == null)
+        {
+            FailStart(default(Scene));
+            yield break;
+        }
+        yield return load;
+        Scene scene = SceneManager.GetSceneByName(operation.MissionScene);
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            FailStart(scene);
+            yield break;
+        }
+        OperationSceneLayout layout = null;
+        foreach (GameObject root in scene.GetRootGameObjects())
+        {
+            layout = root.GetComponentInChildren<OperationSceneLayout>();
+            if (layout != null)
+                break;
+        }
+        if (layout == null || layout.PlayerSpawn == null || mapPreview == null)
+        {
+            FailStart(scene);
+            yield break;
+        }
+
+        mapPreview.SetActive(false);
+        OperationSpawnPoint[] spawns = layout.SpawnPoints;
+        Vector3[] positions = new Vector3[spawns.Length];
         int requiredCount = 0;
         for (int i = 0; i < positions.Length; i++)
         {
-            if (!NavMesh.SamplePosition(operation.EnemySpawns[i].position, out NavMeshHit hit, 1f, NavMesh.AllAreas))
-                return false;
+            if (!NavMesh.SamplePosition(spawns[i].transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                FailStart(scene);
+                yield break;
+            }
             positions[i] = hit.position;
             if (operation.MissionObjective == OperationDefinition.Objective.EliminateAll ||
-                operation.EnemySpawns[i].inObjectiveArea)
+                spawns[i].RequiredTarget)
                 requiredCount++;
         }
-        if (requiredCount == 0)
-            return false;
+        NavMeshAgent leader = player.GetComponent<NavMeshAgent>();
+        if (requiredCount == 0 || !NavMesh.SamplePosition(layout.PlayerSpawn.position, out NavMeshHit playerHit, 2f, NavMesh.AllAreas) ||
+            leader == null || !leader.Warp(playerHit.position))
+        {
+            FailStart(scene);
+            yield break;
+        }
 
         if (archerSelected)
             Spawn(archerPrefab, new Vector3(-1.4f, 0f, -1.4f));
@@ -166,11 +213,10 @@ public class SquadPreparation : MonoBehaviour
         List<EnemyTarget> required = new List<EnemyTarget>(requiredCount);
         for (int i = 0; i < positions.Length; i++)
         {
-            EnemyTarget prefab = operation.EnemySpawns[i].prefabOverride != null ?
-                operation.EnemySpawns[i].prefabOverride : enemyPrefab;
+            EnemyTarget prefab = spawns[i].EnemyPrefab != null ? spawns[i].EnemyPrefab : enemyPrefab;
             EnemyTarget enemy = Instantiate(prefab, positions[i], Quaternion.identity);
             bool objective = operation.MissionObjective == OperationDefinition.Objective.EliminateAll ||
-                operation.EnemySpawns[i].inObjectiveArea;
+                spawns[i].RequiredTarget;
             if (objective)
                 required.Add(enemy);
             if (operation.MissionObjective == OperationDefinition.Objective.ClearArea && objective)
@@ -181,11 +227,22 @@ public class SquadPreparation : MonoBehaviour
             }
         }
         started = true;
+        loading = false;
         mission.Begin(required.ToArray());
         player.enabled = true;
         Time.timeScale = 1f;
         RefreshUI();
-        return true;
+    }
+
+    private void FailStart(Scene scene)
+    {
+        Debug.LogError("Operation scene is missing a valid layout or NavMesh: " + operation.MissionScene);
+        if (scene.IsValid() && scene.isLoaded)
+            SceneManager.UnloadSceneAsync(scene);
+        if (mapPreview != null)
+            mapPreview.SetActive(true);
+        loading = false;
+        RefreshUI();
     }
 
     private void Spawn(CharacterCombat prefab, Vector3 offset)
@@ -225,6 +282,7 @@ public class SquadPreparation : MonoBehaviour
         if (started || choosingOperation || operation == null)
             return;
         preparationTitle.text = operation.DisplayName + "  |  Squad " + SelectedCount + "/" + operation.MaxSquadSize;
+        startButton.interactable = !loading;
         RefreshChoice(archerButton, CharacterCombat.Class.Archer, archerSelected);
         RefreshChoice(mageButton, CharacterCombat.Class.Mage, mageSelected);
     }

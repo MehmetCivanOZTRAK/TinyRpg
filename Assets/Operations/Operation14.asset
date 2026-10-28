@@ -16,25 +16,35 @@ MonoBehaviour:
   displayName: 14. Rotting Grove
   prerequisiteMissionId: operation-13
   mapScene: Map2Scene
+  missionScene: Operation14
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 0
   enemySpawns:
   - position: {x: -3.15, y: 0, z: -0.00000027538175}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 2.7279806, y: 0, z: -1.5749993}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -1.5750006, y: 0, z: 2.7279797}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 0.000002090364, y: 0, z: -3.15}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5749997, y: 0, z: 2.7279801}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279806, y: 0, z: -1.574999}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 3.15, y: 0, z: 0.0000001502535}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279809, y: 0, z: 1.5749987}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 225
   threeStarMaxSquadDeaths: 0

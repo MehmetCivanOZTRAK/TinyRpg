@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 29. Last Approach
   prerequisiteMissionId: operation-28
   mapScene: Map3Scene
+  missionScene: Operation29
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

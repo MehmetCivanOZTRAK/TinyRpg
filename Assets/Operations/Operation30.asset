@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 30. Shadow Warden
   prerequisiteMissionId: operation-29
   mapScene: Map3Scene
+  missionScene: Operation30
   finalOperation: 1
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

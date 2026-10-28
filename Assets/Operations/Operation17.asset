@@ -16,27 +16,38 @@ MonoBehaviour:
   displayName: 17. Broken Shrine
   prerequisiteMissionId: operation-16
   mapScene: Map2Scene
+  missionScene: Operation17
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 0
   enemySpawns:
   - position: {x: 3.15, y: 0, z: 0.0000005507635}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279801, y: 0, z: 1.5749997}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5750016, y: 0, z: -2.7279794}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -0.00000011269012, y: 0, z: 3.15}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -1.5749987, y: 0, z: -2.7279809}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 2.7279787, y: 0, z: 1.5750024}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -3.15, y: 0, z: -0.000004180728}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 2.72798, y: 0, z: -1.5750004}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -1.5750008, y: 0, z: 2.7279797}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 270
   threeStarMaxSquadDeaths: 0

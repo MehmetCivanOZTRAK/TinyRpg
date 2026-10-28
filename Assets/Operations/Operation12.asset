@@ -16,23 +16,32 @@ MonoBehaviour:
   displayName: 12. Thorn Hollow
   prerequisiteMissionId: operation-11
   mapScene: Map2Scene
+  missionScene: Operation12
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 1
   enemySpawns:
   - position: {x: 1.5749999, y: 0, z: 2.7279801}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279797, y: 0, z: -1.5750006}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 3.15, y: 0, z: 0.0000005507635}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279801, y: 0, z: 1.5749997}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5750016, y: 0, z: -2.7279794}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -0.00000011269012, y: 0, z: 3.15}
     inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
   - position: {x: -1.5749987, y: 0, z: -2.7279809}
     inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 195
   threeStarMaxSquadDeaths: 0
