@@ -9,10 +9,13 @@ public class MissionManager : MonoBehaviour
     private Health[] squad;
     private GUIStyle label;
     private bool started;
+    private float startTime;
+    private int squadDeaths;
 
     public Result State { get; private set; }
     public int Total { get; private set; }
     public int Remaining { get; private set; }
+    public int StarsEarned { get; private set; }
 
     private void Start()
     {
@@ -25,6 +28,7 @@ public class MissionManager : MonoBehaviour
         if (started)
             return;
         started = true;
+        startTime = Time.time;
         EnemyTarget[] targets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
         enemies = new Health[targets.Length];
         Total = Remaining = targets.Length;
@@ -60,6 +64,7 @@ public class MissionManager : MonoBehaviour
     {
         if (State != Result.InProgress)
             return;
+        squadDeaths++;
         foreach (Health member in squad)
             if (member != null && member.IsAlive)
                 return;
@@ -69,6 +74,15 @@ public class MissionManager : MonoBehaviour
     private void Finish(Result result)
     {
         State = result;
+        if (result == Result.Completed)
+        {
+            OperationDefinition operation = GetComponent<SquadPreparation>()?.Operation;
+            if (operation != null)
+            {
+                StarsEarned = operation.EvaluateStars(Time.time - startTime, squadDeaths);
+                OperationProgress.Record(operation.MissionId, StarsEarned);
+            }
+        }
         PlayerController player = FindFirstObjectByType<PlayerController>();
         if (player != null)
             player.enabled = false;
@@ -101,12 +115,16 @@ public class MissionManager : MonoBehaviour
             "Operation 1\nEliminate enemies: " + (Total - Remaining) + "/" + Total, label);
         if (State != Result.InProgress)
         {
-            GUI.Box(new Rect(300, 175, 360, 190), GUIContent.none);
-            GUI.Label(new Rect(320, 193, 320, 45),
+            GUI.Box(new Rect(300, 155, 360, 250), GUIContent.none);
+            GUI.Label(new Rect(320, 175, 320, 45),
                 State == Result.Completed ? "Mission Completed" : "Mission Failed", label);
-            GUI.Label(new Rect(320, 245, 320, 35),
+            GUI.Label(new Rect(320, 230, 320, 35),
                 "Enemies eliminated: " + (Total - Remaining) + "/" + Total, label);
-            if (GUI.Button(new Rect(385, 300, 190, 42), "Retry"))
+            OperationDefinition operation = GetComponent<SquadPreparation>()?.Operation;
+            GUI.Label(new Rect(320, 275, 320, 35),
+                "Stars: " + StarsEarned + "   Best: " +
+                (operation != null ? OperationProgress.BestStars(operation.MissionId) : 0), label);
+            if (GUI.Button(new Rect(385, 330, 190, 42), "Retry"))
                 Retry();
         }
         GUI.matrix = previousMatrix;
