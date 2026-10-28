@@ -1,26 +1,32 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SquadHud : MonoBehaviour
 {
-    private GUIStyle label;
+    [SerializeField] private GameObject hudRoot;
+    [SerializeField] private GameObject[] rows;
+    [SerializeField] private Text[] healthLabels;
+    [SerializeField] private Image[] healthFills;
+    [SerializeField] private Text[] abilityLabels;
 
-    private void OnGUI()
+    private SquadPreparation preparation;
+
+    private void Awake()
     {
-        SquadPreparation preparation = FindFirstObjectByType<SquadPreparation>();
-        if (preparation != null && !preparation.Started)
+        preparation = FindFirstObjectByType<SquadPreparation>();
+    }
+
+    private void Update()
+    {
+        if (hudRoot == null)
+            return;
+        bool visible = preparation == null || preparation.Started;
+        if (hudRoot.activeSelf != visible)
+            hudRoot.SetActive(visible);
+        if (!visible)
             return;
 
-        Matrix4x4 previousMatrix = GUI.matrix;
-        float scale = Mathf.Max(1f, Mathf.Min(Screen.width / 960f, Screen.height / 540f));
-        GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * previousMatrix;
-        if (label == null)
-        {
-            label = new GUIStyle(GUI.skin.label);
-            label.fontSize = 15;
-            label.normal.textColor = Color.white;
-        }
-
-        int row = 0;
+        int activeRows = 0;
         foreach (CharacterAbilityController abilities in FindObjectsByType<CharacterAbilityController>(FindObjectsSortMode.None))
         {
             if (!abilities.isActiveAndEnabled)
@@ -29,22 +35,21 @@ public class SquadHud : MonoBehaviour
             CharacterCombat combat = abilities.GetComponent<CharacterCombat>();
             if (health == null || combat == null)
                 continue;
+            int index = (int)combat.CharacterClass;
+            if (index >= rows.Length)
+                continue;
 
-            Rect panel = new Rect(16, 16 + row++ * 76, 270, 68);
-            GUI.Box(panel, GUIContent.none);
-            GUI.Label(new Rect(panel.x + 10, panel.y + 4, 245, 22),
-                combat.CharacterClass + "  " + health.CurrentHealth + "/" + health.MaxHealth + " HP", label);
-            Rect bar = new Rect(panel.x + 10, panel.y + 29, 250, 9);
-            GUI.DrawTexture(bar, Texture2D.whiteTexture);
-            GUI.color = health.IsAlive ? new Color(0.2f, 0.8f, 0.35f) : Color.gray;
-            GUI.DrawTexture(new Rect(bar.x, bar.y, bar.width * health.CurrentHealth / health.MaxHealth, bar.height),
-                Texture2D.whiteTexture);
-            GUI.color = Color.white;
-            GUI.Label(new Rect(panel.x + 10, panel.y + 42, 250, 22),
-                "Q: " + Status(abilities, CharacterAbilityController.Slot.Q) +
-                "   E: " + Status(abilities, CharacterAbilityController.Slot.E), label);
+            activeRows |= 1 << index;
+            healthLabels[index].text = combat.CharacterClass + "  " +
+                health.CurrentHealth + "/" + health.MaxHealth + " HP";
+            healthFills[index].rectTransform.localScale =
+                new Vector3((float)health.CurrentHealth / health.MaxHealth, 1f, 1f);
+            abilityLabels[index].text = "Q: " + Status(abilities, CharacterAbilityController.Slot.Q) +
+                "   E: " + Status(abilities, CharacterAbilityController.Slot.E);
         }
-        GUI.matrix = previousMatrix;
+        for (int i = 0; i < rows.Length; i++)
+            if (rows[i].activeSelf != ((activeRows & (1 << i)) != 0))
+                rows[i].SetActive((activeRows & (1 << i)) != 0);
     }
 
     private static string Status(CharacterAbilityController abilities, CharacterAbilityController.Slot slot)

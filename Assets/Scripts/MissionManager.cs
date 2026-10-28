@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MissionManager : MonoBehaviour
 {
@@ -7,7 +8,14 @@ public class MissionManager : MonoBehaviour
 
     private Health[] enemies;
     private Health[] squad;
-    private GUIStyle label;
+    [SerializeField] private GameObject objectivePanel;
+    [SerializeField] private Text objectiveText;
+    [SerializeField] private GameObject resultPanel;
+    [SerializeField] private Text resultTitle;
+    [SerializeField] private Text resultDetails;
+    [SerializeField] private Text resultStars;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Button mapButton;
     private bool started;
     private float startTime;
     private int squadDeaths;
@@ -16,6 +24,16 @@ public class MissionManager : MonoBehaviour
     public int Total { get; private set; }
     public int Remaining { get; private set; }
     public int StarsEarned { get; private set; }
+
+    private void Awake()
+    {
+        if (objectivePanel != null)
+            objectivePanel.SetActive(false);
+        if (resultPanel != null)
+            resultPanel.SetActive(false);
+        retryButton.onClick.AddListener(Retry);
+        mapButton.onClick.AddListener(() => GetComponent<SquadPreparation>()?.ReturnToMap());
+    }
 
     private void Start()
     {
@@ -49,6 +67,7 @@ public class MissionManager : MonoBehaviour
 
         if (Total == 0 || squad.Length == 0)
             Finish(Result.Failed);
+        RefreshUI();
     }
 
     private void OnEnemyDied(Health _)
@@ -58,6 +77,8 @@ public class MissionManager : MonoBehaviour
         Remaining--;
         if (Remaining == 0)
             Finish(Result.Completed);
+        else
+            RefreshUI();
     }
 
     private void OnSquadDied(Health _)
@@ -87,6 +108,7 @@ public class MissionManager : MonoBehaviour
         if (player != null)
             player.enabled = false;
         Time.timeScale = 0f;
+        RefreshUI();
     }
 
     public void Retry()
@@ -96,45 +118,24 @@ public class MissionManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    private void OnGUI()
+    private void RefreshUI()
     {
-        if (!started)
+        if (objectivePanel == null || resultPanel == null)
             return;
-        Matrix4x4 previousMatrix = GUI.matrix;
-        float scale = Mathf.Max(1f, Mathf.Min(Screen.width / 960f, Screen.height / 540f));
-        GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * previousMatrix;
-        if (label == null)
-        {
-            label = new GUIStyle(GUI.skin.label);
-            label.fontSize = 18;
-            label.alignment = TextAnchor.MiddleCenter;
-            label.normal.textColor = Color.white;
-        }
-
-        GUI.Box(new Rect(644, 16, 300, 68), GUIContent.none);
+        objectivePanel.SetActive(started);
+        resultPanel.SetActive(started && State != Result.InProgress);
         OperationDefinition current = GetComponent<SquadPreparation>()?.Operation;
         string objective = current != null && current.MissionObjective == OperationDefinition.Objective.ClearArea ?
             "Clear marked area: " : "Eliminate enemies: ";
-        GUI.Label(new Rect(652, 21, 284, 58),
-            (current != null ? current.DisplayName : "Operation 1") + "\n" +
-            objective + (Total - Remaining) + "/" + Total, label);
+        objectiveText.text = (current != null ? current.DisplayName : "Operation 1") + "\n" +
+            objective + (Total - Remaining) + "/" + Total;
         if (State != Result.InProgress)
         {
-            GUI.Box(new Rect(300, 155, 360, 280), GUIContent.none);
-            GUI.Label(new Rect(320, 175, 320, 45),
-                State == Result.Completed ? "Mission Completed" : "Mission Failed", label);
-            GUI.Label(new Rect(320, 230, 320, 35),
-                "Enemies eliminated: " + (Total - Remaining) + "/" + Total, label);
-            OperationDefinition operation = GetComponent<SquadPreparation>()?.Operation;
-            GUI.Label(new Rect(320, 275, 320, 35),
-                "Stars: " + StarsEarned + "   Best: " +
-                (operation != null ? OperationProgress.BestStars(operation.MissionId) : 0), label);
-            if (GUI.Button(new Rect(385, 330, 190, 42), "Retry"))
-                Retry();
-            if (GUI.Button(new Rect(385, 378, 190, 42), "Map"))
-                GetComponent<SquadPreparation>()?.ReturnToMap();
+            resultTitle.text = State == Result.Completed ? "Mission Completed" : "Mission Failed";
+            resultDetails.text = "Enemies eliminated: " + (Total - Remaining) + "/" + Total;
+            resultStars.text = "Stars: " + StarsEarned + "   Best: " +
+                (current != null ? OperationProgress.BestStars(current.MissionId) : 0);
         }
-        GUI.matrix = previousMatrix;
     }
 
     private void OnDestroy()
