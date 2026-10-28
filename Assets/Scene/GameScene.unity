@@ -217,6 +217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 375666505}
   - component: {fileID: 375666504}
+  - component: {fileID: 375666506}
   m_Layer: 0
   m_Name: Mission Manager
   m_TagString: Untagged
@@ -251,6 +252,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &375666506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375666503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b39d656f7c573754782a3e3de1c2c6f5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SquadPreparation
+  operation: {fileID: 11400000, guid: d3360379908f46c4ba662d814b658288, type: 2}
+  archerPrefab: {fileID: 1951749244121168901, guid: 8d96dfca0e8809640afdddad37165381, type: 3}
+  magePrefab: {fileID: 5335597068458069971, guid: a2b08540c3a0cb44eb8399563c9ea914, type: 3}
+  archerUnlockStars: 3
+  mageUnlockStars: 6
 --- !u!1 &717086720
 GameObject:
   m_ObjectHideFlags: 0
