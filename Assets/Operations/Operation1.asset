@@ -13,8 +13,15 @@ MonoBehaviour:
   m_Name: Operation1
   m_EditorClassIdentifier: Assembly-CSharp::OperationDefinition
   missionId: operation-1
-  displayName: Operation 1
+  displayName: 1. Outskirts
+  prerequisiteMissionId:
   maxSquadSize: 1
   availableCharacters: 00000000
+  objective: 0
+  enemySpawns:
+  - position: {x: -3, y: 0, z: 3}
+    inObjectiveArea: 1
+  - position: {x: 3, y: 0, z: -3}
+    inObjectiveArea: 1
   twoStarTimeSeconds: 120
   threeStarMaxSquadDeaths: 0
