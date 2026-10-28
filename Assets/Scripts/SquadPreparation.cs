@@ -21,6 +21,9 @@ public class SquadPreparation : MonoBehaviour
     [SerializeField] private Button mageButton;
     [SerializeField] private Button startButton;
     [SerializeField] private Button backButton;
+    [SerializeField] private Button switchMapButton;
+    [SerializeField] private string otherMapScene;
+    [SerializeField] private OperationDefinition switchMapUnlockOperation;
 
     private bool archerSelected;
     private bool mageSelected;
@@ -59,6 +62,7 @@ public class SquadPreparation : MonoBehaviour
         mageButton.onClick.AddListener(() => TrySelect(CharacterCombat.Class.Mage));
         startButton.onClick.AddListener(() => StartOperation());
         backButton.onClick.AddListener(() => { choosingOperation = true; RefreshUI(); });
+        switchMapButton.onClick.AddListener(SwitchMap);
         RefreshUI();
     }
 
@@ -88,6 +92,15 @@ public class SquadPreparation : MonoBehaviour
         pendingMissionId = null;
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void SwitchMap()
+    {
+        if (switchMapButton.interactable && !string.IsNullOrEmpty(otherMapScene))
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(otherMapScene);
+        }
     }
 
     public bool IsUnlocked(CharacterCombat.Class character)
@@ -120,6 +133,7 @@ public class SquadPreparation : MonoBehaviour
     {
         if (started || choosingOperation || operation == null || player == null || mission == null || enemyPrefab == null ||
             operation.EnemySpawns == null || operation.EnemySpawns.Length == 0 ||
+            !string.IsNullOrEmpty(operation.MapScene) && operation.MapScene != SceneManager.GetActiveScene().name ||
             !operation.Allows(CharacterCombat.Class.Warrior) ||
             SelectedCount > operation.MaxSquadSize ||
             archerSelected && (archerPrefab == null || !IsUnlocked(CharacterCombat.Class.Archer)) ||
@@ -183,6 +197,8 @@ public class SquadPreparation : MonoBehaviour
         preparationPanel.SetActive(!started && !choosingOperation);
         if (!started && choosingOperation)
         {
+            switchMapButton.interactable = switchMapUnlockOperation == null ||
+                OperationProgress.IsCompleted(switchMapUnlockOperation.MissionId);
             for (int i = 0; i < operations.Length && i < operationButtons.Length; i++)
             {
                 OperationDefinition candidate = operations[i];
