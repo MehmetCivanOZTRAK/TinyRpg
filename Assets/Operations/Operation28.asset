@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 28. Warden's Guard
   prerequisiteMissionId: operation-27
   mapScene: Map3Scene
+  missionScene: Operation28
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

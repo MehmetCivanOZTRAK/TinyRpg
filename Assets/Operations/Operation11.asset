@@ -16,23 +16,32 @@ MonoBehaviour:
   displayName: 11. Cursed Path
   prerequisiteMissionId: operation-10
   mapScene: Map2Scene
+  missionScene: Operation11
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 0
   enemySpawns:
   - position: {x: 3.15, y: 0, z: 0}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279801, y: 0, z: 1.5750003}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5749998, y: 0, z: -2.7279801}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -0.0000010639637, y: 0, z: 3.15}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -1.5750006, y: 0, z: -2.72798}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 2.7279797, y: 0, z: 1.5750008}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -3.15, y: 0, z: -0.0000021279275}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 180
   threeStarMaxSquadDeaths: 0

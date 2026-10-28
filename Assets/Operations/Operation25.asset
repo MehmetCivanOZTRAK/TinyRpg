@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 25. Night Crossing
   prerequisiteMissionId: operation-24
   mapScene: Map3Scene
+  missionScene: Operation25
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 23. Black Hollow
   prerequisiteMissionId: operation-22
   mapScene: Map3Scene
+  missionScene: Operation23
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

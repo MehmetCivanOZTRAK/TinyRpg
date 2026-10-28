@@ -15,15 +15,21 @@ MonoBehaviour:
   missionId: operation-3
   displayName: 3. Supply Trail
   prerequisiteMissionId: operation-2
+  mapScene:
+  missionScene: Operation03
+  finalOperation: 0
   maxSquadSize: 2
   availableCharacters: 0000000001000000
   objective: 0
   enemySpawns:
   - position: {x: -3, y: 0, z: -3}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -3.5, y: 0, z: 0}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -3, y: 0, z: 3}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 160
   threeStarMaxSquadDeaths: 0

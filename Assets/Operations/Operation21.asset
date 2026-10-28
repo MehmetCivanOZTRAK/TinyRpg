@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: 21. Shadow Pass
   prerequisiteMissionId: operation-20
   mapScene: Map3Scene
+  missionScene: Operation21
   finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000

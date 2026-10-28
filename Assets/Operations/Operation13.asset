@@ -16,23 +16,32 @@ MonoBehaviour:
   displayName: 13. Witchwood Edge
   prerequisiteMissionId: operation-12
   mapScene: Map2Scene
+  missionScene: Operation13
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 1
   enemySpawns:
   - position: {x: -1.5750003, y: 0, z: 2.7279801}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 0.000000037563375, y: 0, z: -3.15}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5749989, y: 0, z: 2.7279809}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279801, y: 0, z: -1.5749998}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 3.15, y: 0, z: 0.000001101527}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -2.7279813, y: 0, z: 1.5749979}
     inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
   - position: {x: 1.5750008, y: 0, z: -2.7279797}
     inObjectiveArea: 0
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 210
   threeStarMaxSquadDeaths: 0

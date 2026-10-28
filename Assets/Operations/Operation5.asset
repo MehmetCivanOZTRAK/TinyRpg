@@ -15,17 +15,24 @@ MonoBehaviour:
   missionId: operation-5
   displayName: 5. North Gate
   prerequisiteMissionId: operation-4
+  mapScene:
+  missionScene: Operation05
+  finalOperation: 0
   maxSquadSize: 3
   availableCharacters: 000000000100000002000000
   objective: 0
   enemySpawns:
   - position: {x: 0, y: 0, z: 3.5}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: 0, y: 0, z: -3.5}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -3, y: 0, z: -3}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   - position: {x: -3.5, y: 0, z: 0}
     inObjectiveArea: 1
+    prefabOverride: {fileID: 0}
   twoStarTimeSeconds: 200
   threeStarMaxSquadDeaths: 0
