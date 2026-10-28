@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class SquadPreparation : MonoBehaviour
 {
@@ -12,6 +13,14 @@ public class SquadPreparation : MonoBehaviour
     [SerializeField] private CharacterCombat magePrefab;
     [SerializeField, Min(0)] private int archerUnlockStars = 3;
     [SerializeField, Min(0)] private int mageUnlockStars = 6;
+    [SerializeField] private GameObject mapPanel;
+    [SerializeField] private Button[] operationButtons;
+    [SerializeField] private GameObject preparationPanel;
+    [SerializeField] private Text preparationTitle;
+    [SerializeField] private Button archerButton;
+    [SerializeField] private Button mageButton;
+    [SerializeField] private Button startButton;
+    [SerializeField] private Button backButton;
 
     private bool archerSelected;
     private bool mageSelected;
@@ -20,8 +29,6 @@ public class SquadPreparation : MonoBehaviour
     private static string pendingMissionId;
     private PlayerController player;
     private MissionManager mission;
-    private GUIStyle label;
-    private GUIStyle button;
 
     public bool Started => started;
     public OperationDefinition Operation => operation;
@@ -42,6 +49,17 @@ public class SquadPreparation : MonoBehaviour
                 if (candidate != null && candidate.MissionId == retryId)
                     TryChooseOperation(candidate);
         }
+        for (int i = 0; i < operationButtons.Length && i < operations.Length; i++)
+        {
+            OperationDefinition candidate = operations[i];
+            if (operationButtons[i] != null)
+                operationButtons[i].onClick.AddListener(() => TryChooseOperation(candidate));
+        }
+        archerButton.onClick.AddListener(() => TrySelect(CharacterCombat.Class.Archer));
+        mageButton.onClick.AddListener(() => TrySelect(CharacterCombat.Class.Mage));
+        startButton.onClick.AddListener(() => StartOperation());
+        backButton.onClick.AddListener(() => { choosingOperation = true; RefreshUI(); });
+        RefreshUI();
     }
 
     public bool IsOperationUnlocked(OperationDefinition candidate) => candidate != null &&
@@ -55,6 +73,7 @@ public class SquadPreparation : MonoBehaviour
         operation = candidate;
         archerSelected = mageSelected = false;
         choosingOperation = false;
+        RefreshUI();
         return true;
     }
 
@@ -93,6 +112,7 @@ public class SquadPreparation : MonoBehaviour
             archerSelected = !archerSelected;
         else
             mageSelected = !mageSelected;
+        RefreshUI();
         return true;
     }
 
@@ -143,6 +163,7 @@ public class SquadPreparation : MonoBehaviour
         mission.Begin(required.ToArray());
         player.enabled = true;
         Time.timeScale = 1f;
+        RefreshUI();
         return true;
     }
 
@@ -154,70 +175,42 @@ public class SquadPreparation : MonoBehaviour
         Instantiate(prefab, position, player.transform.rotation);
     }
 
-    private void OnGUI()
+    private void RefreshUI()
     {
-        if (started)
+        if (mapPanel == null || preparationPanel == null)
             return;
-
-        if (label == null)
+        mapPanel.SetActive(!started && choosingOperation);
+        preparationPanel.SetActive(!started && !choosingOperation);
+        if (!started && choosingOperation)
         {
-            label = new GUIStyle(GUI.skin.label) { fontSize = 20, alignment = TextAnchor.MiddleCenter };
-            button = new GUIStyle(GUI.skin.button) { fontSize = 17 };
-        }
-        Matrix4x4 previousMatrix = GUI.matrix;
-        GUI.matrix = Matrix4x4.Scale(new Vector3(Screen.width / 960f, Screen.height / 540f, 1f)) * previousMatrix;
-        Color previousColor = GUI.color;
-        if (choosingOperation)
-        {
-            GUI.color = new Color(0.15f, 0.18f, 0.22f, 0.95f);
-            GUI.Box(new Rect(55, 30, 850, 480), GUIContent.none);
-            GUI.color = previousColor;
-            GUI.Label(new Rect(180, 42, 600, 42), "Map 1 — Operations", label);
-            for (int i = 0; i < operations.Length; i++)
+            for (int i = 0; i < operations.Length && i < operationButtons.Length; i++)
             {
                 OperationDefinition candidate = operations[i];
-                if (candidate == null)
+                Button button = operationButtons[i];
+                if (candidate == null || button == null)
                     continue;
                 bool unlocked = IsOperationUnlocked(candidate);
                 int best = OperationProgress.BestStars(candidate.MissionId);
-                bool wasEnabled = GUI.enabled;
-                GUI.enabled = unlocked;
-                int column = i / 5;
-                int row = i % 5;
                 string status = best > 0 ? "  " + best + "/3 stars" : unlocked ? "  Available" : "  Locked";
-                if (GUI.Button(new Rect(85 + column * 420, 105 + row * 72, 370, 52), candidate.DisplayName + status, button))
-                    TryChooseOperation(candidate);
-                GUI.enabled = wasEnabled;
+                button.interactable = unlocked;
+                button.GetComponentInChildren<Text>().text = candidate.DisplayName + status;
             }
-            GUI.matrix = previousMatrix;
-            return;
         }
-        GUI.color = new Color(0.15f, 0.18f, 0.22f, 0.95f);
-        GUI.Box(new Rect(270, 100, 420, 360), GUIContent.none);
-        GUI.color = previousColor;
-        GUI.Label(new Rect(290, 130, 380, 40),
-            operation.DisplayName + "  |  Squad " + SelectedCount + "/" + operation.MaxSquadSize, label);
-        GUI.Label(new Rect(305, 180, 350, 34), "Warrior — selected", label);
-        DrawChoice(CharacterCombat.Class.Archer, archerSelected, 225);
-        DrawChoice(CharacterCombat.Class.Mage, mageSelected, 270);
-        if (GUI.Button(new Rect(375, 350, 210, 48), "Start Operation", button))
-            StartOperation();
-        if (GUI.Button(new Rect(375, 405, 210, 38), "Back to Map", button))
-            choosingOperation = true;
-        GUI.matrix = previousMatrix;
+        if (started || choosingOperation || operation == null)
+            return;
+        preparationTitle.text = operation.DisplayName + "  |  Squad " + SelectedCount + "/" + operation.MaxSquadSize;
+        RefreshChoice(archerButton, CharacterCombat.Class.Archer, archerSelected);
+        RefreshChoice(mageButton, CharacterCombat.Class.Mage, mageSelected);
     }
 
-    private void DrawChoice(CharacterCombat.Class character, bool selected, int y)
+    private void RefreshChoice(Button button, CharacterCombat.Class character, bool selected)
     {
         bool available = operation.Allows(character) && IsUnlocked(character);
         string caption = !operation.Allows(character) ? character + " — unavailable here" :
             !IsUnlocked(character) ? character + " — locked" :
             character + (selected ? " — selected" : " — select");
-        bool previousEnabled = GUI.enabled;
-        GUI.enabled = available && (selected || SelectedCount < operation.MaxSquadSize);
-        if (GUI.Button(new Rect(305, y, 350, 38), caption, button))
-            TrySelect(character);
-        GUI.enabled = previousEnabled;
+        button.interactable = available && (selected || SelectedCount < operation.MaxSquadSize);
+        button.GetComponentInChildren<Text>().text = caption;
     }
 
     private void OnDestroy()
