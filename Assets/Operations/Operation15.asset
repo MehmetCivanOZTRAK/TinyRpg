@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a0907b99e2a0044a290a64af1edd89, type: 3}
+  m_Name: Operation15
+  m_EditorClassIdentifier: Assembly-CSharp::OperationDefinition
+  missionId: operation-15
+  displayName: 15. Fog Crossing
+  prerequisiteMissionId: operation-14
+  mapScene: Map2Scene
+  maxSquadSize: 3
+  availableCharacters: 000000000100000002000000
+  objective: 1
+  enemySpawns:
+  - position: {x: -1.5749998, y: 0, z: -2.7279801}
+    inObjectiveArea: 1
+  - position: {x: 2.7279801, y: 0, z: 1.5750003}
+    inObjectiveArea: 1
+  - position: {x: -3.15, y: 0, z: -0.00000007512675}
+    inObjectiveArea: 1
+  - position: {x: 2.7279809, y: 0, z: -1.5749989}
+    inObjectiveArea: 1
+  - position: {x: -1.5750024, y: 0, z: 2.7279787}
+    inObjectiveArea: 1
+  - position: {x: 0.0000041431645, y: 0, z: -3.15}
+    inObjectiveArea: 1
+  - position: {x: 1.5750004, y: 0, z: 2.72798}
+    inObjectiveArea: 0
+  - position: {x: -2.7279797, y: 0, z: -1.5750008}
+    inObjectiveArea: 0
+  twoStarTimeSeconds: 240
+  threeStarMaxSquadDeaths: 0

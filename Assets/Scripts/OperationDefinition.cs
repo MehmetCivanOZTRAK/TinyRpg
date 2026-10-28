@@ -16,6 +16,7 @@ public class OperationDefinition : ScriptableObject
     [SerializeField] private string missionId = "operation-1";
     [SerializeField] private string displayName = "Operation 1";
     [SerializeField] private string prerequisiteMissionId;
+    [SerializeField] private string mapScene;
     [SerializeField, Min(1)] private int maxSquadSize = 1;
     [SerializeField] private CharacterCombat.Class[] availableCharacters = { CharacterCombat.Class.Warrior };
     [SerializeField] private Objective objective;
@@ -26,6 +27,7 @@ public class OperationDefinition : ScriptableObject
     public string MissionId => missionId;
     public string DisplayName => displayName;
     public string PrerequisiteMissionId => prerequisiteMissionId;
+    public string MapScene => mapScene;
     public int MaxSquadSize => Mathf.Max(1, maxSquadSize);
     public Objective MissionObjective => objective;
     public EnemySpawn[] EnemySpawns => enemySpawns;
