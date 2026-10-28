@@ -16,3 +16,5 @@ MonoBehaviour:
   displayName: Operation 1
   maxSquadSize: 1
   availableCharacters: 00000000
+  twoStarTimeSeconds: 120
+  threeStarMaxSquadDeaths: 0

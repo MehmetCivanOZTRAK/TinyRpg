@@ -18,6 +18,7 @@ public class SquadPreparation : MonoBehaviour
     private GUIStyle button;
 
     public bool Started => started;
+    public OperationDefinition Operation => operation;
     public int SelectedCount => 1 + (archerSelected ? 1 : 0) + (mageSelected ? 1 : 0);
 
     private void Awake()
@@ -31,8 +32,7 @@ public class SquadPreparation : MonoBehaviour
 
     public bool IsUnlocked(CharacterCombat.Class character)
     {
-        // shortcut: TINY-22 will write the earned star total after each operation.
-        int stars = PlayerPrefs.GetInt("TinyRpg.TotalStars", 0);
+        int stars = OperationProgress.TotalStars;
         return character == CharacterCombat.Class.Warrior ||
             character == CharacterCombat.Class.Archer && stars >= archerUnlockStars ||
             character == CharacterCombat.Class.Mage && stars >= mageUnlockStars;
