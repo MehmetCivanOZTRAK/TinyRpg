@@ -25,7 +25,7 @@ public class EnemyTarget : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < 0.35f)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             transform.localScale = Vector3.Lerp(startingScale, Vector3.zero, elapsed / 0.35f);
             yield return null;
         }
